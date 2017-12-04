@@ -8,4 +8,7 @@ public class PlayManager : SingletonMonoBehaviour<PlayManager> {
     protected override void Awake() {
         base.Awake();
     }
+
+    private void Update() {
+    }
 }
