@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(GridLayoutGroup))]
-public class Spacement : MonoBehaviour {
+public class CardSpacement : MonoBehaviour {
 
     [SerializeField, Range(3,5)]
     private int cardNumber = 3;
