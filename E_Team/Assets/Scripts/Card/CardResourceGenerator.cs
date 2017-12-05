@@ -1,11 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿// ==================================================
+// テクスチャからカードを生成するスクリプト
+// ==================================================
 using UnityEngine;
 
 public class CardResourceGenerator : MonoBehaviour {
-
-    [SerializeField]
-    private Vector2 rectSize = new Vector2(150F, 250F);
 
     [SerializeField]
     private Texture2D cardBack;
@@ -14,10 +12,21 @@ public class CardResourceGenerator : MonoBehaviour {
     [SerializeField]
     private Texture2D[] cardDesigns;
 
+    [HideInInspector]
+    public GameObject[] cards;
+
+    /// <summary>
+    /// 開始時に実行
+    /// </summary>
     private void Start() {
-        for (int i = 0; i < cardDesigns.Length; i++)
+        // カードのサイズを管理者から取得
+        var rectSize = PlayManager.instance.CardSize;
+
+        // デザイン数のカードを生成
+        cards = new GameObject[cardDesigns.Length];
+        for (int i = 0; i < cards.Length; i++)
         {
-            // カードの生成
+            // UIオブジェクトの生成
             var card = CreateUI.Create("Card (" + i + ")", transform);
             card.AddComponent<Card>();
 
@@ -33,6 +42,9 @@ public class CardResourceGenerator : MonoBehaviour {
             var back = CreateUI.Create("Back", card.transform);
             CreateUI.Attach(back, cardBack, rectSize);
             back.SetActive(true);
+
+            // カードを保存
+            cards[i] = card;
         }
     }
 }

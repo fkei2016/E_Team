@@ -1,9 +1,13 @@
 ﻿// ==================================================
 // プレイシーンの管理者クラス
-// ==================================================1
+// ==================================================
 using UnityEngine;
 
 public class PlayManager : SingletonMonoBehaviour<PlayManager> {
+
+    [SerializeField]
+    private Vector2 cardSize = new Vector2(150F, 250F);
+    public Vector2 CardSize { get { return cardSize; } }
 
     private Player[] players;
 
@@ -11,8 +15,5 @@ public class PlayManager : SingletonMonoBehaviour<PlayManager> {
         base.Awake();
 
         players = FindObjectsOfType<Player>();
-    }
-
-    private void Update() {
     }
 }

@@ -16,7 +16,7 @@ public class CreateUI : MonoBehaviour {
     /// <param name="objName"></param>
     /// <param name="parent"></param>
     /// <returns></returns>
-    static public GameObject Create(string objName, Transform parent = null) {
+    static public GameObject Create(string objName, Transform parent = null, Action act = null) {
         // RectTransformを追加してUIにする
         var obj = new GameObject(objName);
         obj.AddComponent<RectTransform>();
