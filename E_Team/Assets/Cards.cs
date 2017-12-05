@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class ButtonTest : MonoBehaviour {
+public class Cards : MonoBehaviour {
 
+    [SerializeField]
+    Text text;
+    
 	// Use this for initialization
 	void Start () {
 		
@@ -15,9 +18,8 @@ public class ButtonTest : MonoBehaviour {
 		
 	}
 
-    public void OnClickButton()
+    public void Clicked()
     {
-        var text = GetComponentInChildren<Text>();
         text.enabled = true;
         print(text.text);
     }
