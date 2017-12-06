@@ -485,7 +485,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardNumber: 3
-  cardSize: {x: 150, y: 225}
 --- !u!114 &1877729622
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -494,6 +493,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1877729614}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94707ab58ce74d241badd653e1239422, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f2901558a9dbde46934ec824712804a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  text: {fileID: 114937544858110942, guid: 4628498521fcc0e4db3913db946d2df9, type: 2}
