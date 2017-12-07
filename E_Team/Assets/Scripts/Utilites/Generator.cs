@@ -14,7 +14,7 @@ public class Generator : MonoBehaviour {
     /// <param name="name"></param>
     /// <param name="parent"></param>
     /// <returns></returns>
-    protected GameObject CreateUI(string name, Transform parent) {
+    static public GameObject CreateUI(string name, Transform parent) {
         // オブジェクトを生成してUIに必要な設定をする
         var obj = new GameObject(name);
         obj.AddComponent<RectTransform>();
@@ -29,7 +29,7 @@ public class Generator : MonoBehaviour {
     /// <param name="owner"></param>
     /// <param name="tex"></param>
     /// <param name="size"></param>
-    protected void AttachImage(GameObject owner, Texture2D tex, Vector2 size) {
+    static public void AttachImage(GameObject owner, Texture2D tex, Vector2 size) {
         // "Image"コンポーネントを取得
         var image = owner.GetComponent<Image>();
         if(image == null)

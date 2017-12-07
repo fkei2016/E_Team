@@ -11,9 +11,9 @@ public class CardSpacement : MonoBehaviour {
     private GridLayoutGroup layout;
 
     /// <summary>
-    /// 開始時に実行
+    /// 生成時の処理
     /// </summary>
-    private void Start() {
+    private void Awake() {
         // レイアウトの横幅を取得
         rectWidth = GetComponent<RectTransform>().sizeDelta.x;
         // 均等に並ぶようにレイアウトを設定
@@ -21,13 +21,14 @@ public class CardSpacement : MonoBehaviour {
     }
 
     /// <summary>
-    /// 更新時に実行
+    /// レイアウトの調整
     /// </summary>
-    private void Update() {
+    /// <param name="rowCardNum"></param>
+    /// <param name="cardSize"></param>
+    public void AdjustmentLayout(int rowCardNum, Vector2 cardSize) {
         // レイヤーとカードの横幅から1枚ごとの間隔を計算
-        var pairCardNum = CardManager.instance.Pair;
-        var cardsWidth = CardManager.instance.CardSize.x * pairCardNum;
-        var spacing = (rectWidth - cardsWidth) / pairCardNum;
+        var cardsWidth = cardSize.x * rowCardNum;
+        var spacing = (rectWidth - cardsWidth) / rowCardNum;
 
         // 均等に並ぶようにレイアウトを設定
         layout.padding.left = (int)spacing;
