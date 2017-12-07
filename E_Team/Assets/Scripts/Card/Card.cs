@@ -41,13 +41,14 @@ public class Card : MonoBehaviour {
     /// </summary>
     public void Open() {
         Draw(false);
-        Debug.Log(number);
+        CardManager.instance.SendCard(this);
     }
 
     /// <summary>
     /// カードを閉じる
     /// </summary>
-    public void Close() {
+    public IEnumerator Close() {
+        yield return new WaitForSeconds(1F);
         Draw(true);
     }
 }

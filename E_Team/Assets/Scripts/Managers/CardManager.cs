@@ -18,14 +18,41 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private CardGenerator generator;
     private CardSpacement spacement;
 
+    public void SendCard(Card card) {
+        // カードを積む
+        pairCard.Push(card);
+
+        if (pairCard.Count >= 2)
+        {
+            var c1 = pairCard.Pop();
+            var c2 = pairCard.Pop();
+
+            Debug.Log(c1);
+            Debug.Log(c2);
+
+            if (c1.number == c2.number)
+            {
+                Debug.Log("Combe");
+            }
+            else
+            {
+                Debug.Log("Miss");
+                StartCoroutine(c1.Close());
+                StartCoroutine(c2.Close());
+            }
+        }
+    }
+
     /// <summary>
     /// 開始時に処理
     /// </summary>
     private void Start() {
+        // ペアを組むスタック
+        pairCard = new Stack<Card>();
         // シーンから「生成機」と「配置」を検索
         generator = FindObjectOfType<CardGenerator>();
         spacement = FindObjectOfType<CardSpacement>();
-
+        // カードの生成
         RemakeCards(pair * 2);
     }
 
@@ -48,6 +75,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         if(Input.GetKeyDown(KeyCode.Space))
         {
             SetPairCards();
+            foreach (var card in fieldCards)
+                StartCoroutine(card.Close());
         }
     }
 
@@ -65,6 +94,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     /// カードをペア番号に設定
     /// </summary>
     public void SetPairCards() {
+        pairCard.Clear();
         var pairList = MakePairNumbers();
         for (int i = 0; i < fieldCards.Length; i++)
         {
