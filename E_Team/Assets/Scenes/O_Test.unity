@@ -410,8 +410,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestory: 0
-  pair: 4
-  cardSize: {x: 150, y: 250}
+  pair: 6
+  cardSize: {x: 120, y: 180}
   test: {fileID: 73729988}
 --- !u!4 &1059509658
 Transform:
@@ -543,8 +543,8 @@ MonoBehaviour:
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 120, y: 250}
-  m_Spacing: {x: 5, y: 10}
+  m_CellSize: {x: 120, y: 180}
+  m_Spacing: {x: 5, y: 50}
   m_Constraint: 0
   m_ConstraintCount: 2
 --- !u!114 &1589382954

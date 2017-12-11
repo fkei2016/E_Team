@@ -33,6 +33,6 @@ public class CardSpacement : MonoBehaviour {
         // 均等に並ぶようにレイアウトを設定
         layout.cellSize = cardSize;
         layout.padding.left = (int)spacing;
-        layout.spacing = new Vector2(spacing / 2, 10);
+        layout.spacing = new Vector2(spacing / 2, layout.spacing.y);
     }
 }
