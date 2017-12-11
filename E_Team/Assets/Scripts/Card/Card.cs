@@ -47,8 +47,8 @@ public class Card : MonoBehaviour {
     /// <summary>
     /// カードを閉じる
     /// </summary>
-    public IEnumerator Close() {
-        yield return new WaitForSeconds(1F);
+    public IEnumerator Close(float waitTime = 1F) {
+        yield return new WaitForSeconds(waitTime);
         Draw(true);
     }
 }

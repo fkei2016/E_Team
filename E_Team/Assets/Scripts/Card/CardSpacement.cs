@@ -31,6 +31,7 @@ public class CardSpacement : MonoBehaviour {
         var spacing = (rectWidth - cardsWidth) / rowCardNum;
 
         // 均等に並ぶようにレイアウトを設定
+        layout.cellSize = cardSize;
         layout.padding.left = (int)spacing;
         layout.spacing = new Vector2(spacing / 2, 10);
     }
