@@ -19,21 +19,28 @@ public class CardGenerator : Generator {
     /// <summary>
     /// カードを生成
     /// </summary>
-    /// <returns></returns>
-    public Card CreateCard(Vector2 cardSize) {
-        var card = CreateCardDesign(cardSize);
+    /// <returns>
+    /// 単体のカード
+    /// </returns>
+    public Card CreateCard() {
+        var card = CreateCardDesign();
         return card.AddComponent<Card>();
     }
 
     /// <summary>
     /// カードを生成
     /// </summary>
-    /// <returns></returns>
-    public Card[] CreateCards(int cardNum, Vector2 cardSize) {
+    /// <param name="cardNum">
+    /// カード番号
+    /// </param>
+    /// <returns>
+    /// 複数のカード
+    /// </returns>
+    public Card[] CreateCards(int cardNum) {
         var cards = new Card[cardNum];
         for(int i = 0; i < cards.Length; i++)
         {
-            cards[i] = CreateCard(cardSize);
+            cards[i] = CreateCard();
         }
         return cards;
     }
@@ -41,27 +48,35 @@ public class CardGenerator : Generator {
     /// <summary>
     /// カードの番号を変更
     /// </summary>
-    /// <param name="number"></param>
-    /// <param name="card"></param>
-    /// <param name="cardSize"></param>
-    public void ChangeCardNumber(int number, Card card, Vector2 cardSize) {
-        var cardDesign = card.transform.GetChild(1).gameObject;
-        AttachImage(cardDesign, designs[number], cardSize);
+    /// <param name="number">
+    /// カード番号
+    /// </param>
+    /// <param name="card">
+    /// カード
+    /// </param>
+    public void ChangeCardNumber(int number, Card card) {
+        // カード番号の割り当て
         card.number = number + 1;
+
+        // カードの「柄」部分を変更
+        var cardDesign = card.transform.GetChild(1).gameObject;
+        AttachImage(cardDesign, designs[number]);
     }
 
 
     /// <summary>
-    /// カードのデザインを生成
+    /// カードデザインの生成
     /// </summary>
-    /// <param name="designTex"></param>
-    private GameObject CreateCardDesign(Vector2 cardSize) {
+    /// <returns>
+    /// カードのオブジェクト
+    /// </returns>
+    private GameObject CreateCardDesign() {
         // 親オブジェクトの作成
         var card = CreateUI("Card", transform);
 
         // 「枠」の追加
         var frame = CreateUI("Frame", card.transform);
-        AttachImage(frame, frameTex, cardSize);
+        AttachImage(frame, frameTex);
 
         // 「柄」の追加
         var design = CreateUI("Design", card.transform);
@@ -69,7 +84,7 @@ public class CardGenerator : Generator {
 
         // 「背面」の追加
         var back = CreateUI("Back", card.transform);
-        AttachImage(back, backTex, cardSize);
+        AttachImage(back, backTex);
 
         return card;
     }

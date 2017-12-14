@@ -411,7 +411,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   dontDestory: 0
   pair: 6
-  cardSize: {x: 120, y: 180}
   test: {fileID: 73729988}
 --- !u!4 &1059509658
 Transform:
@@ -497,7 +496,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1589382952}
   - component: {fileID: 1589382953}
-  - component: {fileID: 1589382954}
   - component: {fileID: 1589382955}
   m_Layer: 5
   m_Name: CardLayout
@@ -547,17 +545,6 @@ MonoBehaviour:
   m_Spacing: {x: 5, y: 50}
   m_Constraint: 0
   m_ConstraintCount: 2
---- !u!114 &1589382954
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1589382951}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 77b6a011c77689f4fa741207b48f0c5b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &1589382955
 MonoBehaviour:
   m_ObjectHideFlags: 0
