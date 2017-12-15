@@ -7,21 +7,21 @@ using UnityEngine;
 
 public class CardManager : SingletonMonoBehaviour<CardManager> {
 
-    [SerializeField, Range(3, 6)]
+    [SerializeField, Range(2, 6)]
     private int pair = 3;
-
-    private Vector2 cardSize;
 
     private int pairCount = 0;
     private int missCount = 0;
+
     [SerializeField]
-    private UnityEngine.UI.Text test;
+    private UnityEngine.UI.Text debugText;
 
     private int keepPairNum;
     private Card[] useCards;
+    private Vector2 cardSize;
     private Stack<Card> pairCard;
     private CardGenerator generator;
-    //private CardSpacement spacement;
+    private CardSpacement spacement;
 
 
     /// <summary>
@@ -33,7 +33,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
         // シーンから「生成機」と「配置」を検索
         generator = FindObjectOfType<CardGenerator>();
-        //spacement = FindObjectOfType<CardSpacement>();
+        spacement = FindObjectOfType<CardSpacement>();
 
         // カードの生成
         MakeCards(pair * 2);
@@ -51,16 +51,16 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             MakeCards(pair * 2);
         }
 
-        //// カード配置の調整
-        //spacement.AdjustmentLayout(pair, cardSize);
+        // カード配置の調整
+        spacement.AdjustmentLayout(useCards, generator.CardSize);
 
         // [Debug]ペア番号を再設定
-        if(Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             ResetCards(true, 0F);
         }
         // [Debug]ミス回数と引いた回数の表示を更新
-        test.text = missCount.ToString() + " / " + pairCount.ToString();
+        debugText.text = missCount.ToString() + " / " + pairCount.ToString();
     }
 
     /// <summary>

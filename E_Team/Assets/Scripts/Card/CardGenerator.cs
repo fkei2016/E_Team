@@ -14,6 +14,7 @@ public class CardGenerator : Generator {
     [SerializeField]
     private Texture2D[] designs;
 
+    public Vector2 CardSize { get { return new Vector2(backTex.width, backTex.height); } }
     public int DesignLength { get { return designs.Length; } }
 
     /// <summary>
