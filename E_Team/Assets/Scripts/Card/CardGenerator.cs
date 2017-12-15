@@ -61,6 +61,7 @@ public class CardGenerator : Generator {
 
         // カードの「柄」部分を変更
         var cardDesign = card.transform.GetChild(1).gameObject;
+        cardDesign.transform.rotation = Quaternion.Euler(Vector3.up * 180F);
         AttachImage(cardDesign, designs[number]);
     }
 

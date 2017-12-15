@@ -11,6 +11,7 @@ public class Card : MonoBehaviour {
     public int number = 0;
 
     private GameObject back;
+    private Vector3 toRotation;
 
     /// <summary>
     /// 開始時に実行
@@ -18,6 +19,8 @@ public class Card : MonoBehaviour {
     private void Start() {
         // 背面の取得
         back = transform.GetChild(transform.childCount - 1).gameObject;
+        // 初期の角度を設定
+        toRotation = Vector3.zero;
 
         // "EventTrigger"に追加する
         var trigger = gameObject.AddComponent<EventTrigger>();
@@ -29,18 +32,30 @@ public class Card : MonoBehaviour {
     }
 
     /// <summary>
-    /// カードの表裏を設定
+    /// 更新時に実行
     /// </summary>
-    /// <param name="isOpen"></param>
-    private void Draw(bool isOpen) {
-        back.SetActive(isOpen);
+    private void Update() {
+        // 回転処理をかける
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(toRotation), Time.deltaTime);
+
+        // 「柄」を表示
+        if (back.activeSelf && transform.localEulerAngles.y >= 180F - 90F)
+        {
+            back.SetActive(false);
+        }
+        // 「背面」を表示
+        if(!back.activeSelf && transform.localEulerAngles.y >= 360F - 90F)
+        {
+            back.SetActive(true);
+        }
     }
 
     /// <summary>
     /// カードを開く
     /// </summary>
     public void Open() {
-        Draw(false);
+        back.SetActive(false);
+        toRotation = Vector3.up * 180F;
         CardManager.instance.SendCard(this);
     }
 
@@ -49,6 +64,7 @@ public class Card : MonoBehaviour {
     /// </summary>
     public IEnumerator Close(float waitTime = 1F) {
         yield return new WaitForSeconds(waitTime);
-        Draw(true);
+        toRotation = Vector3.up * 360F;
+        back.SetActive(true);
     }
 }

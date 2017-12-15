@@ -85,8 +85,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             {
                 missCount++;
 
-                StartCoroutine(c1.Close());
-                StartCoroutine(c2.Close());
+                StartCoroutine(c1.Close(2F));
+                StartCoroutine(c2.Close(2F));
             }
         }
 
@@ -119,7 +119,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // 値を再配布してカードを閉じる
         if(resetPairs) SetPairCards(useCards);
         foreach (var card in useCards)
-            StartCoroutine(card.Close(1F));
+            StartCoroutine(card.Close(waitTime));
     }
 
     /// <summary>
