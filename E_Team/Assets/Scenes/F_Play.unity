@@ -225,7 +225,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetCanvas: {fileID: 276099306}
-  PopupText: {fileID: 1047187816985464, guid: ca5b1aeb018e9c64786d14924cbf71a7, type: 2}
+  PopupText: {fileID: 1801028331913902, guid: f6f87c93312d6024194cb100fe555c3b, type: 2}
   ComboCount: 0
 --- !u!4 &65595130
 Transform:
