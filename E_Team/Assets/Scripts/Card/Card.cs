@@ -8,8 +8,12 @@ using UnityEngine.EventSystems;
 
 public class Card : MonoBehaviour {
 
+    [HideInInspector]
     public int number = 0;
+    [HideInInspector]
     public float rotaSpd = 1F;
+    [HideInInspector]
+    public Vector2 size = Vector2.one;
 
     private GameObject back;
     private bool rotateFlag;
@@ -29,7 +33,7 @@ public class Card : MonoBehaviour {
         // "PointerDown"に処理を登録
         var entry = new EventTrigger.Entry();
         entry.eventID = EventTriggerType.PointerDown;
-        entry.callback.AddListener(data => { if (back.activeSelf) Open(); });
+        entry.callback.AddListener(data => { if (!rotateFlag) Open(); });
         trigger.triggers.Add(entry);
     }
 

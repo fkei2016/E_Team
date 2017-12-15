@@ -12,7 +12,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     [SerializeField]
     private float cardRotaSpeed = 1F;
 
-    private int pairCount = 0;
+    private int passCount = 0;
     private int missCount = 0;
 
     [SerializeField]
@@ -38,7 +38,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         spacement = FindObjectOfType<CardSpacement>();
 
         // カードの生成
-        MakeCards(pair * 2);
+        useCards = MakeCards(pair * 2);
     }
 
     /// <summary>
@@ -50,7 +50,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         {
             foreach (var card in useCards)
                 Destroy(card.gameObject);
-            MakeCards(pair * 2);
+            useCards = MakeCards(pair * 2);
         }
 
         // 回転速度の変更
@@ -60,21 +60,31 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         }
 
         // カード配置の調整
-        spacement.AdjustmentLayout(useCards, generator.CardSize);
+        spacement.AdjustmentLayout(useCards);
 
-        // [Debug]ペア番号を再設定
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            ResetCards(true, 0F);
-        }
         // [Debug]ミス回数と引いた回数の表示を更新
-        debugText.text = missCount.ToString() + " / " + pairCount.ToString();
+        debugText.text = missCount.ToString() + " / " + passCount.ToString();
+
+
+        // 全てのカードが開いているか
+        foreach (var card in useCards)
+        {
+            var back = card.transform.GetChild(2).gameObject;
+            if (back.activeSelf) return;
+        }
+
+        foreach(var card in useCards)
+        {
+            Destroy(card.gameObject);
+        }
+        useCards = MakeCards(pair * 2);
     }
 
     /// <summary>
     /// 送られてきたカードを受け取る
     /// </summary>
-    /// <param name="card"></param>
+    /// <param name="card">
+    /// </param>
     public void SendCard(Card card) {
         // カードを積む
         pairCard.Push(card);
@@ -83,7 +93,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         if (pairCard.Count >= 2)
         {
             // 引いた回数
-            pairCount++;
+            passCount++;
 
             // ２枚のカードを参照
             var c1 = pairCard.Pop();
@@ -91,120 +101,25 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
             if (c1.number != c2.number)
             {
+                // ミスの回数
                 missCount++;
-
+                // カードを閉じる
                 StartCoroutine(c1.Close(2F));
                 StartCoroutine(c2.Close(2F));
             }
         }
-
-        // 全てのカードが開いているか
-        foreach(var c in useCards)
-        {
-            var back = c.transform.GetChild(2).gameObject;
-            if (back.activeSelf) return;
-        }
-        // カードの再設定
-        ResetCards(true, 1F);
-    }
-
-
-
-    /// <summary>
-    /// カードの再設定
-    /// </summary>
-    /// <param name="resetPairs">
-    /// 番号の再割り当て
-    /// </param>
-    /// <param name="waitTime">
-    /// 遅延時間
-    /// </param>
-    public void ResetCards(bool resetPairs, float waitTime) {
-        // [Debug]回数の初期化
-        pairCount = 0;
-        missCount = 0;
-
-        // 値を再配布してカードを閉じる
-        if(resetPairs) SetPairCards(useCards);
-        foreach (var card in useCards)
-            StartCoroutine(card.Close(waitTime));
     }
 
     /// <summary>
-    /// ペア番号をカードに設定
-    /// </summary>
-    /// <param name="cards">
-    /// 複数のカード
-    /// </param>
-    public void SetPairCards(Card[] cards) {
-        // ペアリストの初期化
-        pairCard.Clear();
-
-        // ペア番号の生成
-        var pairList = MakePairNumbers();
-        for (int i = 0; i < cards.Length; i++)
-        {
-            // 重複しない値をカードに設定
-            var number = GetNonOverlappingValue(pairList);
-            generator.ChangeCardNumber(number, cards[i]);
-        }
-    }
-    /// <summary>
-    /// カードの再生成
+    /// カードの生成
     /// </summary>
     /// <param name="cardNum">
     /// カードの枚数
     /// </param>
-    private void MakeCards(int cardNum) {
+    private Card[] MakeCards(int cardNum) {
         // ペア数を保存
         keepPairNum = cardNum / 2;
         // 使用するカードを生成
-        useCards = generator.CreateCards(cardNum);
-        // カードにペア番号を割り当て
-        SetPairCards(useCards);
-    }
-
-    /// <summary>
-    /// ペアリストを作成
-    /// </summary>
-    /// <returns>
-    /// ペアリスト
-    /// </returns>
-    private List<int> MakePairNumbers() {
-        // 「柄の数」分の数列を作成
-        var rangeList = new List<int>();
-        for (int i = 0; i < generator.DesignLength; i++)
-        {
-            rangeList.Add(i);
-        }
-
-        // 数列からペアになる番号の抽選
-        var pairNumbers = new List<int>();
-        for (var i = 0; i < useCards.Length / 2; i++)
-        {
-            var rnd = GetNonOverlappingValue(rangeList);
-            pairNumbers.Add(rnd);
-            pairNumbers.Add(rnd);
-        }
-        return pairNumbers;
-    }
-
-
-    /// <summary>
-    /// リストから重複しない番号を抽選
-    /// </summary>
-    /// <param name="list">
-    /// 整数リスト
-    /// </param>
-    /// <returns>
-    /// 重複しない値
-    /// </returns>
-    private int GetNonOverlappingValue(List<int> list) {
-        // ランダムに要素番号を選ぶ
-        var rnd = Random.Range(0, list.Count);
-        // リストから値を取り除く
-        rnd = list[rnd];
-        list.Remove(rnd);
-        return rnd;
+        return generator.CreateCards(cardNum);
     }
 }

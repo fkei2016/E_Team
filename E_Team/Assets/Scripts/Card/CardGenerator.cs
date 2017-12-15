@@ -14,20 +14,6 @@ public class CardGenerator : Generator {
     [SerializeField]
     private Texture2D[] designs;
 
-    public Vector2 CardSize { get { return new Vector2(backTex.width, backTex.height); } }
-    public int DesignLength { get { return designs.Length; } }
-
-    /// <summary>
-    /// カードを生成
-    /// </summary>
-    /// <returns>
-    /// 単体のカード
-    /// </returns>
-    public Card CreateCard() {
-        var card = CreateCardDesign();
-        return card.AddComponent<Card>();
-    }
-
     /// <summary>
     /// カードを生成
     /// </summary>
@@ -38,56 +24,99 @@ public class CardGenerator : Generator {
     /// 複数のカード
     /// </returns>
     public Card[] CreateCards(int cardNum) {
+        // ペアリストの作成
+        var pairList = MakePairNumbers(designs.Length, cardNum);
+
+        // カードを複数枚の作成
         var cards = new Card[cardNum];
         for(int i = 0; i < cards.Length; i++)
         {
-            cards[i] = CreateCard();
+            var num = GetNonOverlappingValue(pairList);
+            cards[i] = CreateCard(num);
         }
         return cards;
     }
 
     /// <summary>
-    /// カードの番号を変更
+    /// カードの生成
     /// </summary>
     /// <param name="number">
     /// カード番号
     /// </param>
-    /// <param name="card">
-    /// カード
-    /// </param>
-    public void ChangeCardNumber(int number, Card card) {
-        // カード番号の割り当て
-        card.number = number + 1;
+    /// <returns>
+    /// 単体のカード
+    /// </returns>
+    private Card CreateCard(int number) {
+        // 親オブジェクトの作成
+        var obj = CreateUI("Card", transform);
 
-        // カードの「柄」部分を変更
-        var cardDesign = card.transform.GetChild(1).gameObject;
-        cardDesign.transform.rotation = Quaternion.Euler(Vector3.up * 180F);
-        AttachImage(cardDesign, designs[number]);
+        // 「枠」の追加
+        var frame = CreateUI("Frame", obj.transform);
+        AttachImage(frame, frameTex);
+
+        // 「柄」の追加
+        var design = CreateUI("Design", obj.transform);
+        AttachImage(design, designs[number]);
+        design.transform.rotation = Quaternion.Euler(Vector3.up * 180F);
+
+        // 「背面」の追加
+        var back = CreateUI("Back", obj.transform);
+        AttachImage(back, backTex);
+
+        // カードに番号とサイズを割り振ってから返す
+        var card = obj.AddComponent<Card>();
+        card.number = number + 1;
+        card.size = new Vector2(backTex.width, backTex.height);
+        return card;
+    }
+
+    /// <summary>
+    /// ペアリストの作成
+    /// </summary>
+    /// <param name="numLength">
+    /// 数列の長さ
+    /// </param>
+    /// <param name="cardMaxSize">
+    /// カードの最大数
+    /// </param>
+    /// <returns>
+    /// ペアリスト
+    /// </returns>
+    private List<int> MakePairNumbers(int numLength, int cardMaxSize) {
+        // 「柄の数」分の数列を作成
+        var rangeList = new List<int>();
+        for (int i = 0; i < numLength; i++)
+        {
+            rangeList.Add(i);
+        }
+
+        // 数列からペアになる番号の抽選
+        var pairNumbers = new List<int>();
+        for (var i = 0; i < cardMaxSize / 2; i++)
+        {
+            var num = GetNonOverlappingValue(rangeList);
+            pairNumbers.Add(num);
+            pairNumbers.Add(num);
+        }
+        return pairNumbers;
     }
 
 
     /// <summary>
-    /// カードデザインの生成
+    /// リストから重複しない番号を抽選
     /// </summary>
+    /// <param name="list">
+    /// 整数リスト
+    /// </param>
     /// <returns>
-    /// カードのオブジェクト
+    /// 重複しない値
     /// </returns>
-    private GameObject CreateCardDesign() {
-        // 親オブジェクトの作成
-        var card = CreateUI("Card", transform);
-
-        // 「枠」の追加
-        var frame = CreateUI("Frame", card.transform);
-        AttachImage(frame, frameTex);
-
-        // 「柄」の追加
-        var design = CreateUI("Design", card.transform);
-        //AttachImage(design, designTex, cardSize);
-
-        // 「背面」の追加
-        var back = CreateUI("Back", card.transform);
-        AttachImage(back, backTex);
-
-        return card;
+    private int GetNonOverlappingValue(List<int> list) {
+        // ランダムに要素番号を選ぶ
+        var element = Random.Range(0, list.Count);
+        // リストから値を取り除く
+        element = list[element];
+        list.Remove(element);
+        return element;
     }
 }

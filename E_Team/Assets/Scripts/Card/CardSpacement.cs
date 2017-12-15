@@ -23,20 +23,12 @@ public class CardSpacement : MonoBehaviour {
     /// <summary>
     /// レイアウトの調整
     /// </summary>
-    /// <param name="rowCardNum"></param>
-    /// <param name="cardSize"></param>
-    public void AdjustmentLayout(int rowCardNum, Vector2 cardSize) {
-        //// レイヤーとカードの横幅から1枚ごとの間隔を計算
-        //var cardsWidth = cardSize.x * rowCardNum;
-        //var spacing = (rectWidth - cardsWidth) / rowCardNum;
-
-        //// 均等に並ぶようにレイアウトを設定
-        //layout.cellSize = cardSize;
-        //layout.padding.left = (int)spacing;
-        //layout.spacing = new Vector2(spacing / 2, layout.spacing.y);
-    }
-
-    public void AdjustmentLayout(Card[] cardList, Vector2 cardSize) {
+    /// <param name="cardList">
+    /// 複数枚のカード
+    /// </param>
+    public void AdjustmentLayout(Card[] cardList) {
+        // カードサイズを取得
+        var cardSize = cardList[0].size;
 
         // 横の枚数、縦の枚数を算出
         var row = cardList.Length / 2;
@@ -55,5 +47,13 @@ public class CardSpacement : MonoBehaviour {
         {
             card.transform.localScale = Vector2.one * scale;
         }
+
+        cardSize *= scale;
+        Debug.Log(cardSize);
+        var margin = rectSize.size - new Vector2(cardSize.x * row, cardSize.y * col);
+        Debug.Log(margin);
+        layout.padding.left = (int)margin.x / 4;
+        layout.padding.top = (int)margin.y / 4;
+        layout.spacing = new Vector2(0F, cardSize.y / row);
     }
 }
