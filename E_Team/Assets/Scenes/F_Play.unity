@@ -120,7 +120,6 @@ GameObject:
   - component: {fileID: 2304820}
   - component: {fileID: 2304819}
   - component: {fileID: 2304818}
-  - component: {fileID: 2304823}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -198,19 +197,49 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2304823
+--- !u!1 &65595128
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 65595130}
+  - component: {fileID: 65595129}
+  m_Layer: 0
+  m_Name: TouchCombo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &65595129
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2304817}
+  m_GameObject: {fileID: 65595128}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 19f8897774dd90b4cb7c9c51bd4c08aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   TargetCanvas: {fileID: 276099306}
-  PopupText: {fileID: 1127199879506264, guid: ca5b1aeb018e9c64786d14924cbf71a7, type: 2}
+  PopupText: {fileID: 1801028331913902, guid: f6f87c93312d6024194cb100fe555c3b, type: 2}
+  ComboCount: 0
+--- !u!4 &65595130
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 65595128}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.7382362, y: 0.707654, z: 90.061874}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &198164777
 GameObject:
   m_ObjectHideFlags: 0
@@ -282,7 +311,7 @@ GameObject:
   m_Component:
   - component: {fileID: 276099307}
   m_Layer: 5
-  m_Name: GameObject
+  m_Name: ComboLayer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -301,11 +330,11 @@ RectTransform:
   m_Father: {fileID: 1877729618}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 0, y: -960}
+  m_SizeDelta: {x: 150, y: 200}
+  m_Pivot: {x: 0, y: 0}
 --- !u!1 &1721712741
 GameObject:
   m_ObjectHideFlags: 0
@@ -396,8 +425,6 @@ GameObject:
   - component: {fileID: 1877729617}
   - component: {fileID: 1877729616}
   - component: {fileID: 1877729615}
-  - component: {fileID: 1877729620}
-  - component: {fileID: 1877729621}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -435,7 +462,7 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 640, y: 960}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3
@@ -481,40 +508,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &1877729620
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1877729614}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -2095666955, guid: f70555f144d8491a825f0804e09c671c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Padding:
-    m_Left: 0
-    m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
-  m_ChildAlignment: 6
-  m_StartCorner: 0
-  m_StartAxis: 0
-  m_CellSize: {x: 150, y: 200}
-  m_Spacing: {x: 100, y: 100}
-  m_Constraint: 0
-  m_ConstraintCount: 2
---- !u!114 &1877729621
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1877729614}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 77b6a011c77689f4fa741207b48f0c5b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &1982050615
 GameObject:
   m_ObjectHideFlags: 0
@@ -525,7 +518,7 @@ GameObject:
   - component: {fileID: 1982050617}
   - component: {fileID: 1982050616}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: TouchParticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -539,7 +532,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1982050615}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5507f8ddb273d6a47802ebdc613df21c, type: 3}
+  m_Script: {fileID: 11500000, guid: 1657280a88e840c4da1e52ddd70ec460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   CLICK_PARTICLE: {fileID: 1414299113293330, guid: 443d52a60c480fb449909207e3a021bb,

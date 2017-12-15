@@ -49,23 +49,36 @@ public class ComboPopUp : MonoBehaviour
         var texts = new List<Combo>();
 
         var root = new GameObject();
-        root.AddComponent<RectTransform>();
+        //root.AddComponent<RectTransform>();
+        var canvasGroup = root.AddComponent<CanvasGroup>();
         root.transform.SetParent(this.TargetCanvas.transform);
         root.transform.localPosition = Vector3.zero;
-        root.transform.localScale = Vector3.one;
+        root.transform.localScale=Vector3.one;
+        //root.GetComponent<RectTransform>().anchorMin = Vector2.zero;
+        //root.GetComponent<RectTransform>().anchorMax = Vector2.zero;
+        //root.transform.localPosition = Vector3.zero;
+        //root.transform.localScale = Vector3.one;
 
-        var canvasGroup = root.AddComponent<CanvasGroup>();
+        //print("aaa= " + root.GetComponent<RectTransform>().transform.localPosition);
+        //root.GetComponent<RectTransform>().transform.localPosition = Vector3.zero;
 
+
+
+        //var canvasGroup = root.AddComponent<CanvasGroup>();
+        //print(PopupString.Length);
+        //文字中央寄せ
+        pos.x = pos.x - ((PopupString.Length-1) / 2 * this.PopupTextWidth);
         foreach (var s in this.PopupString)
         {
             var obj = new GameObject();
-            obj.AddComponent<RectTransform>();
+            //obj.AddComponent<RectTransform>();
             obj.transform.SetParent(root.transform);
             obj.transform.localPosition = pos;
             obj.transform.localScale = Vector3.one;
 
+
             // 1文字ずつ生成
-            var valueText = (GameObject)Instantiate(this.PopupTextObject, Vector3.zero, Quaternion.identity);
+            var valueText = Instantiate(this.PopupTextObject, Vector3.zero, Quaternion.identity);
             var textComp = valueText.GetComponent<Text>();
             textComp.text = s.ToString();
             valueText.transform.SetParent(obj.transform);
