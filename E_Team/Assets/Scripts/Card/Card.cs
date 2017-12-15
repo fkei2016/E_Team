@@ -9,9 +9,11 @@ using UnityEngine.EventSystems;
 public class Card : MonoBehaviour {
 
     public int number = 0;
+    public float rotaSpd = 1F;
 
     private GameObject back;
-    private Vector3 toRotation;
+    private bool rotateFlag;
+    private float toRotation;
 
     /// <summary>
     /// 開始時に実行
@@ -19,8 +21,8 @@ public class Card : MonoBehaviour {
     private void Start() {
         // 背面の取得
         back = transform.GetChild(transform.childCount - 1).gameObject;
-        // 初期の角度を設定
-        toRotation = Vector3.zero;
+        rotateFlag = false;
+        toRotation = 0F;
 
         // "EventTrigger"に追加する
         var trigger = gameObject.AddComponent<EventTrigger>();
@@ -36,13 +38,21 @@ public class Card : MonoBehaviour {
     /// </summary>
     private void Update() {
         // 回転処理をかける
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(toRotation), Time.deltaTime);
+        if(rotateFlag)
+        {
+            transform.Rotate(Vector3.up * rotaSpd);
+            if (transform.localEulerAngles.y >= toRotation - rotaSpd)
+            {
+                rotateFlag = false;
+            }
+        }
 
         // 「柄」を表示
         if (back.activeSelf && transform.localEulerAngles.y >= 180F - 90F)
         {
             back.SetActive(false);
         }
+
         // 「背面」を表示
         if(!back.activeSelf && transform.localEulerAngles.y >= 360F - 90F)
         {
@@ -54,9 +64,9 @@ public class Card : MonoBehaviour {
     /// カードを開く
     /// </summary>
     public void Open() {
-        back.SetActive(false);
-        toRotation = Vector3.up * 180F;
         CardManager.instance.SendCard(this);
+        rotateFlag = true;
+        toRotation = 180F;
     }
 
     /// <summary>
@@ -64,7 +74,7 @@ public class Card : MonoBehaviour {
     /// </summary>
     public IEnumerator Close(float waitTime = 1F) {
         yield return new WaitForSeconds(waitTime);
-        toRotation = Vector3.up * 360F;
-        back.SetActive(true);
+        rotateFlag = true;
+        toRotation = 360F;
     }
 }

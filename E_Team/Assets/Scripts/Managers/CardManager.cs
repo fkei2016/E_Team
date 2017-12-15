@@ -9,6 +9,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
     [SerializeField, Range(2, 6)]
     private int pair = 3;
+    [SerializeField]
+    private float cardRotaSpeed = 1F;
 
     private int pairCount = 0;
     private int missCount = 0;
@@ -49,6 +51,12 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             foreach (var card in useCards)
                 Destroy(card.gameObject);
             MakeCards(pair * 2);
+        }
+
+        // 回転速度の変更
+        foreach(var card in useCards)
+        {
+            card.rotaSpd = cardRotaSpeed;
         }
 
         // カード配置の調整
