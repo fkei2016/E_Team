@@ -47,13 +47,12 @@ public class CardSpacement : MonoBehaviour {
         {
             card.transform.localScale = Vector2.one * scale;
         }
-
         cardSize *= scale;
-        Debug.Log(cardSize);
+
+        // レイアウトのサイズや位置の修正
         var margin = rectSize.size - new Vector2(cardSize.x * row, cardSize.y * col);
-        Debug.Log(margin);
         layout.padding.left = (int)margin.x / 4;
         layout.padding.top = (int)margin.y / 4;
-        layout.spacing = new Vector2(0F, cardSize.y / row);
+        layout.spacing = new Vector2(0F, layout.padding.top);
     }
 }

@@ -33,7 +33,7 @@ public class Card : MonoBehaviour {
         // "PointerDown"に処理を登録
         var entry = new EventTrigger.Entry();
         entry.eventID = EventTriggerType.PointerDown;
-        entry.callback.AddListener(data => { if (!rotateFlag) Open(); });
+        entry.callback.AddListener(data => { if (back.activeSelf && !rotateFlag) Open(); });
         trigger.triggers.Add(entry);
     }
 

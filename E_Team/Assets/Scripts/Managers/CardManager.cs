@@ -4,6 +4,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CardManager : SingletonMonoBehaviour<CardManager> {
 
@@ -20,10 +21,10 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
     private int keepPairNum;
     private Card[] useCards;
-    private Vector2 cardSize;
     private Stack<Card> pairCard;
     private CardGenerator generator;
     private CardSpacement spacement;
+    private Vector3[] cardPositions;
 
 
     /// <summary>
@@ -39,18 +40,54 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
         // カードの生成
         useCards = MakeCards(pair * 2);
+
+        // カード座標の再生成
+        cardPositions = new Vector3[useCards.Length];
     }
 
     /// <summary>
     /// 更新時に処理
     /// </summary>
     private void Update() {
-        // ペア数が変わったときに再生成
+
+        if (spacement.transform.childCount > 0)
+        {
+            if (spacement.transform.GetChild(0).position != cardPositions[0])
+            {
+                for (int i = 0; i < useCards.Length; i++)
+                {
+                    cardPositions[i] = spacement.GetComponent<RectTransform>().GetChild(i).position;
+                }
+            }
+        }
+
+        // カード配布の線形補間
+        for(int i = 0; i < useCards.Length; i++)
+        {
+            useCards[i].transform.position = Vector2.MoveTowards(useCards[i].transform.position, cardPositions[i], Time.deltaTime * 500F);
+        }
+
+        // ペア数が変わったとき
         if (keepPairNum != pair)
         {
-            foreach (var card in useCards)
-                Destroy(card.gameObject);
-            useCards = MakeCards(pair * 2);
+            // カードを再生成
+            ReMakeCards();
+
+            // カード座標の再生成
+            cardPositions = new Vector3[useCards.Length];
+
+            // カード配置の調整
+            spacement.AdjustmentLayout(useCards);
+            foreach(RectTransform child in spacement.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            for (int i = 0; i < useCards.Length; i++)
+            {
+                var obj = new GameObject("Pos(" + i + ")");
+                var rect = obj.AddComponent<RectTransform>();
+                rect.SetParent(spacement.GetComponent<RectTransform>());
+            }
         }
 
         // 回転速度の変更
@@ -59,12 +96,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             card.rotaSpd = cardRotaSpeed;
         }
 
-        // カード配置の調整
-        spacement.AdjustmentLayout(useCards);
-
         // [Debug]ミス回数と引いた回数の表示を更新
         debugText.text = missCount.ToString() + " / " + passCount.ToString();
-
 
         // 全てのカードが開いているか
         foreach (var card in useCards)
@@ -73,11 +106,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             if (back.activeSelf) return;
         }
 
-        foreach(var card in useCards)
-        {
-            Destroy(card.gameObject);
-        }
-        useCards = MakeCards(pair * 2);
+        // 全て開いていたら再設定
+        ReMakeCards();
     }
 
     /// <summary>
@@ -121,5 +151,16 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         keepPairNum = cardNum / 2;
         // 使用するカードを生成
         return generator.CreateCards(cardNum);
+    }
+
+    /// <summary>
+    /// カードの再生成
+    /// </summary>
+    private void ReMakeCards() {
+        // 既存のカードを破棄
+        foreach (var card in useCards)
+            Destroy(card.gameObject);
+        // カードを生成
+        useCards = MakeCards(pair * 2);
     }
 }
