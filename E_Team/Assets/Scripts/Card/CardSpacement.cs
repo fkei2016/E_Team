@@ -9,15 +9,20 @@ public class CardSpacement : MonoBehaviour {
 
     private Rect rectSize;
     private GridLayoutGroup layout;
+    private RectTransform rectTransform;
+
+    public RectTransform RectTransform { get { return rectTransform; } }
 
     /// <summary>
     /// 生成時の処理
     /// </summary>
     private void Awake() {
-        // レイアウトの矩形を取得
-        rectSize = GetComponent<RectTransform>().rect;
         // 均等に並ぶようにレイアウトを設定
         layout = GetComponent<GridLayoutGroup>();
+        // 矩形のトランスフォームを取得
+        rectTransform = GetComponent<RectTransform>();
+        // レイアウトの矩形を取得
+        rectSize = rectTransform.rect;
     }
 
     /// <summary>

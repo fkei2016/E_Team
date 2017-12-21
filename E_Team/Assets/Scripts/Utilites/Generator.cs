@@ -18,7 +18,7 @@ public class Generator : MonoBehaviour {
         // オブジェクトを生成してUIに必要な設定をする
         var obj = new GameObject(name);
         obj.AddComponent<RectTransform>();
-        obj.transform.SetParent(parent);
+        obj.transform.SetParent(parent, false);
         obj.transform.localScale = Vector2.one;
         return obj;
     }
