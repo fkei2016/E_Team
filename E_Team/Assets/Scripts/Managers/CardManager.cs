@@ -12,16 +12,13 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     [SerializeField]
     private float cardRotaSpeed = 1F;
 
-    private int passCount = 0;
-    private int missCount = 0;
-
+    private bool turnFinish;
     private int keepPairNum;
     private Card[] useCards;
     private Stack<Card> pairCard;
     private CardGenerator generator;
     private CardSpacement spacement;
     private Vector3[] cardPositions;
-
 
     /// <summary>
     /// 開始時に処理
@@ -35,7 +32,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         spacement = FindObjectOfType<CardSpacement>();
 
         // カードの生成
-        useCards = MakeCards(pair * 2);
+        RemakeCards(false);
     }
 
     /// <summary>
@@ -43,14 +40,10 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     /// </summary>
     private void Update() {
 
+        // ペア数が変わったときに生成
         if (keepPairNum != pair)
         {
-            // ペア数が変わったとき再生成
-            foreach (var card in useCards)
-            {
-                Destroy(card.gameObject);
-            }
-            useCards = MakeCards(pair * 2);
+            RemakeCards();
         }
 
         // カード配置の再設定
@@ -92,12 +85,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             if (back.activeSelf) return;
         }
 
-        // 全て開いていたら再設定
-        foreach (var card in useCards)
-        {
-            Destroy(card.gameObject);
-        }
-        useCards = MakeCards(pair * 2);
+        // カードの再生成
+        RemakeCards();
     }
 
     /// <summary>
@@ -110,22 +99,37 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         pairCard.Push(card);
 
         // ペアが組まれた場合
-        if (pairCard.Count >= 2)
+        if (pairCard.Count % 2 == 0)
         {
-            // 引いた回数
-            passCount++;
-
             // ２枚のカードを参照
-            var c1 = pairCard.Pop();
-            var c2 = pairCard.Pop();
+            var card1 = pairCard.Pop();
+            var card2 = pairCard.Pop();
 
-            if (c1.number != c2.number)
+            // ミスしたらターン終了
+            turnFinish = (card1.number != card2.number);
+
+            if (turnFinish)
             {
-                // ミスの回数
-                missCount++;
                 // カードを閉じる
-                StartCoroutine(c1.Close(1F));
-                StartCoroutine(c2.Close(1F));
+                StartCoroutine(card1.Close(1F));
+                StartCoroutine(card2.Close(1F));
+            }
+            else
+            {
+                // 成立したペアをスタック
+                pairCard.Push(card1);
+                pairCard.Push(card2);
+            }
+        }
+
+        // ターン交代のタイミング
+        if (turnFinish)
+        {
+            // 成立したペアを消す
+            turnFinish = false;
+            while (pairCard.Count > 0)
+            {
+                StartCoroutine(pairCard.Pop().FadeOut(1F));
             }
         }
     }
@@ -141,41 +145,40 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // ペア数を保存
         keepPairNum = cardNum / 2;
 
+        // ペアカードを初期化
+        pairCard.Clear();
+
         // カードを生成
         var cards = generator.CreateCards(cardNum);
-
-        // カード座標の再生成
-        cardPositions = new Vector3[cards.Length];
-
-        // カード配置の生成と調整
-        spacement.AdjustmentLayout(cards);
-        MakeCardPositions(spacement.RectTransform, cards);
 
         // 生成したカードを返す
         return cards;
     }
 
     /// <summary>
-    /// カード座標の生成
+    /// カードの再生成
     /// </summary>
-    /// <param name="transform">
-    /// 親のトランスフォーム
+    /// <param name="reset">
+    /// 子要素の破棄
     /// </param>
-    /// <param name="cards">
-    /// 使用されるカード
-    /// </param>
-    private void MakeCardPositions(RectTransform transform, Card[] cards) {
-        // 既にある子要素（座標）を破棄
-        foreach (RectTransform child in transform)
+    private void RemakeCards(bool reset = true) {
+        if (reset)
         {
-            Destroy(child.gameObject);
+            // 既存のカードを破棄
+            foreach (var card in useCards)
+            {
+                Destroy(card.gameObject);
+            }
         }
-        // カードの枚数分だけ座標を生成
-        for (int i = 0; i < cards.Length; i++)
-        {
-            var obj = new GameObject("Pos(" + i + ")");
-            var rect = obj.AddComponent<RectTransform>();
-            rect.SetParent(transform);
-        }
+
+        // カードの再生成
+        useCards = MakeCards(pair * 2);
+
+        // カード配置の生成と調整
+        spacement.AdjustmentLayout(useCards);
+        cardPositions = spacement.MakePositions(useCards);
+
+        // ターンを変更
+        turnFinish = false;
     }
 }

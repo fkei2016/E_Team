@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CardGenerator : Generator {
+public class CardGenerator : MonoBehaviour {
 
     [SerializeField]
     private Texture2D backTex;
@@ -48,20 +48,16 @@ public class CardGenerator : Generator {
     /// </returns>
     private Card CreateCard(int number) {
         // 親オブジェクトの作成
-        var obj = CreateUI("Card", transform);
+        var obj = Generator.Create("Card", transform);
 
         // 「枠」の追加
-        var frame = CreateUI("Frame", obj.transform);
-        AttachImage(frame, frameTex);
+        Generator.Create("Frame", obj.transform, frameTex);
 
         // 「柄」の追加
-        var design = CreateUI("Design", obj.transform);
-        AttachImage(design, designs[number]);
-        design.transform.rotation = Quaternion.Euler(Vector3.up * 180F);
+        Generator.Create("Design", obj.transform, designs[number]).transform.rotation = Quaternion.Euler(Vector3.up * 180F);
 
         // 「背面」の追加
-        var back = CreateUI("Back", obj.transform);
-        AttachImage(back, backTex);
+        Generator.Create("Back", obj.transform, backTex);
 
         // カードに番号とサイズを割り振ってから返す
         var card = obj.AddComponent<Card>();

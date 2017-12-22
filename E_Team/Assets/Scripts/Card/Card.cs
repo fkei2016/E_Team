@@ -19,6 +19,8 @@ public class Card : MonoBehaviour {
     private bool rotateFlag;
     private float toRotation;
 
+    private Animation anim;
+
     /// <summary>
     /// 開始時に実行
     /// </summary>
@@ -29,12 +31,18 @@ public class Card : MonoBehaviour {
         toRotation = 0F;
 
         // "EventTrigger"に追加する
-        var trigger = gameObject.AddComponent<EventTrigger>();
+        var trigger = gameObject.AttachComponet<EventTrigger>();
         // "PointerDown"に処理を登録
         var entry = new EventTrigger.Entry();
         entry.eventID = EventTriggerType.PointerDown;
         entry.callback.AddListener(data => { if (back.activeSelf && !rotateFlag) Open(); });
         trigger.triggers.Add(entry);
+
+        // フェードアウトのアニメーションを追加
+        anim = gameObject.AttachComponet<Animation>();
+        var clip = (AnimationClip)Resources.Load("FadeOut");
+        anim.AddClip(clip, clip.name);
+        anim.clip = anim.GetClip(clip.name);
     }
 
     /// <summary>
@@ -80,5 +88,13 @@ public class Card : MonoBehaviour {
         yield return new WaitForSeconds(waitTime);
         rotateFlag = true;
         toRotation = 360F;
+    }
+
+    /// <summary>
+    /// フェードアウトで消える
+    /// </summary>
+    public IEnumerator FadeOut(float waitTime = 0F) {
+        yield return new WaitForSeconds(waitTime);
+        anim.Play();
     }
 }
