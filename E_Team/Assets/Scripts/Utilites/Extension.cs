@@ -5,6 +5,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+
+using EventCall = UnityEngine.Events.UnityAction<UnityEngine.EventSystems.BaseEventData>;
 
 public static class Extension {
 
@@ -41,5 +44,28 @@ public static class Extension {
         var component = gameObject.GetComponent<Type>();
         // 追加したコンポーネントを返す
         return (component) ? component : gameObject.AddComponent<Type>();
+    }
+
+    /// <summary>
+    /// イベントトリガーの追加
+    /// </summary>
+    /// <param name="gameObject">
+    /// 拡張メゾット
+    /// </param>
+    /// <param name="type">
+    /// EventTriggerの種類
+    /// </param>
+    /// <param name="call">
+    /// イベント実行時の処理
+    /// </param>
+    public static void AddEventTrigger(this GameObject gameObject, EventTriggerType type, EventCall call) {
+        // "EventTrigger"コンポーネントの取得
+        var trigger = gameObject.AttachComponet<EventTrigger>();
+        // イベント実行時の処理を登録
+        var entry = new EventTrigger.Entry();
+        entry.eventID = type;
+        entry.callback.AddListener(call);
+        // イベントの追加
+        trigger.triggers.Add(entry);
     }
 }

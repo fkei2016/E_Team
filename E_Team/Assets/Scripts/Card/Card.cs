@@ -30,13 +30,12 @@ public class Card : MonoBehaviour {
         rotateFlag = false;
         toRotation = 0F;
 
-        // "EventTrigger"に追加する
-        var trigger = gameObject.AttachComponet<EventTrigger>();
-        // "PointerDown"に処理を登録
-        var entry = new EventTrigger.Entry();
-        entry.eventID = EventTriggerType.PointerDown;
-        entry.callback.AddListener(data => { if (back.activeSelf && !rotateFlag) Open(); });
-        trigger.triggers.Add(entry);
+        // "EventTrigger"に"PointerDown"の処理を追加する
+        gameObject.AddEventTrigger(EventTriggerType.PointerDown,
+            data => {
+                if (back.activeSelf && !rotateFlag)
+                    Open();
+            });
 
         // フェードアウトのアニメーションを追加
         anim = gameObject.AttachComponet<Animation>();
