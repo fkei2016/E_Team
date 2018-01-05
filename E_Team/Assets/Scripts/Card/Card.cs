@@ -83,7 +83,7 @@ public class Card : MonoBehaviour {
     /// <summary>
     /// カードを閉じる
     /// </summary>
-    public IEnumerator Close(float waitTime = 1F) {
+    public IEnumerator Close(float waitTime = 0F) {
         yield return new WaitForSeconds(waitTime);
         rotateFlag = true;
         toRotation = 360F;

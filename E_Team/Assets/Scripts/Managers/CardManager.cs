@@ -15,6 +15,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private bool turnFinish;
     private int keepPairNum;
     private Card[] useCards;
+    private int remainingCards;
     private Stack<Card> pairCard;
     private CardGenerator generator;
     private CardSpacement spacement;
@@ -78,15 +79,25 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             useCards[i].transform.position = Vector2.MoveTowards(useCards[i].transform.position, cardPositions[i], Time.deltaTime * 500F);
         }
 
-        // 全てのカードが開いているか
-        foreach (var card in useCards)
+        // ターン交代のタイミング
+        if (turnFinish || pairCard.Count >= remainingCards)
         {
-            var back = card.transform.GetChild(2).gameObject;
-            if (back.activeSelf) return;
+            // 成立したペアを消す
+            turnFinish = false;
+            while (pairCard.Count > 0)
+            {
+                var card = pairCard.Pop();
+                StartCoroutine(card.FadeOut(2F));
+                card.enabled = false;
+                remainingCards--;
+            }
         }
 
-        // カードの再生成
-        RemakeCards();
+        if (!turnFinish && remainingCards <= 0)
+        {
+            // カードの再生成
+            RemakeCards();
+        }
     }
 
     /// <summary>
@@ -111,25 +122,14 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             if (turnFinish)
             {
                 // カードを閉じる
-                StartCoroutine(card1.Close(1F));
-                StartCoroutine(card2.Close(1F));
+                StartCoroutine(card1.Close(1.5F));
+                StartCoroutine(card2.Close(1.5F));
             }
             else
             {
                 // 成立したペアをスタック
                 pairCard.Push(card1);
                 pairCard.Push(card2);
-            }
-        }
-
-        // ターン交代のタイミング
-        if (turnFinish)
-        {
-            // 成立したペアを消す
-            turnFinish = false;
-            while (pairCard.Count > 0)
-            {
-                StartCoroutine(pairCard.Pop().FadeOut(1F));
             }
         }
     }
@@ -173,6 +173,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
         // カードの再生成
         useCards = MakeCards(pair * 2);
+        remainingCards = useCards.Length;
 
         // カード配置の生成と調整
         spacement.AdjustmentLayout(useCards);
