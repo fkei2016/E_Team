@@ -9,33 +9,61 @@ using UnityEngine.UI;
 public class Generator : MonoBehaviour {
 
     /// <summary>
-    /// UIオブジェクトの作成
+    /// オブジェクトの作成
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="parent"></param>
-    /// <returns></returns>
-    static public GameObject CreateUI(string name, Transform parent) {
+    /// <param name="name">
+    /// オブジェクト名
+    /// </param>
+    /// <param name="parent">
+    /// 親トランスフォーム
+    /// </param>
+    /// <returns>
+    /// 生成済みオブジェクト
+    /// </returns>
+    static public GameObject Create(string name, Transform parent) {
         // オブジェクトを生成してUIに必要な設定をする
         var obj = new GameObject(name);
         obj.AddComponent<RectTransform>();
-        obj.transform.SetParent(parent);
-        obj.transform.localScale = Vector2.one;
+        obj.transform.Reset(parent, false);
         return obj;
     }
 
     /// <summary>
-    /// UIイメージの追加
+    /// イメージの作成
     /// </summary>
-    /// <param name="owner"></param>
-    /// <param name="tex"></param>
-    /// <param name="size"></param>
-    static public void AttachImage(GameObject owner, Texture2D tex, Vector2 size) {
+    /// <param name="name">
+    /// オブジェクト名
+    /// </param>
+    /// <param name="parent">
+    /// 親トランスフォーム
+    /// </param>
+    /// <param name="tex">
+    /// テクスチャ
+    /// </param>
+    /// <returns>
+    /// 生成済みオブジェクト
+    /// </returns>
+    static public GameObject Create(string name, Transform parent, Texture2D tex) {
+        var obj = Create(name, parent);
+        AttachImage(obj, tex);
+        return obj;
+    }
+
+    /// <summary>
+    /// イメージの追加
+    /// </summary>
+    /// <param name="owner">
+    /// アタッチ先
+    /// </param>
+    /// <param name="tex">
+    /// テクスチャ
+    /// </param>
+    static public void AttachImage(GameObject owner, Texture2D tex) {
+        // テクスチャのサイズを取得
+        var size = new Vector2(tex.width, tex.height);
+
         // "Image"コンポーネントを取得
-        var image = owner.GetComponent<Image>();
-        if(image == null)
-        {
-            image = owner.AddComponent<Image>();
-        }
+        var image = owner.AttachComponet<Image>();
         // サイズとスプライトの設定
         image.rectTransform.sizeDelta = size;
         image.sprite = Sprite.Create(tex, new Rect(Vector2.zero, size), Vector2.one * 0.5F);

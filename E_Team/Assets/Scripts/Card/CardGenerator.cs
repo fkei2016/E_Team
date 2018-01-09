@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CardGenerator : Generator {
+public class CardGenerator : MonoBehaviour {
 
     [SerializeField]
     private Texture2D backTex;
@@ -14,63 +14,105 @@ public class CardGenerator : Generator {
     [SerializeField]
     private Texture2D[] designs;
 
-    public int DesignLength { get { return designs.Length; } }
-
     /// <summary>
     /// カードを生成
     /// </summary>
-    /// <returns></returns>
-    public Card CreateCard(Vector2 cardSize) {
-        var card = CreateCardDesign(cardSize);
-        return card.AddComponent<Card>();
-    }
+    /// <param name="cardNum">
+    /// カード番号
+    /// </param>
+    /// <returns>
+    /// 複数のカード
+    /// </returns>
+    public Card[] CreateCards(int cardNum) {
+        // ペアリストの作成
+        var pairList = MakePairNumbers(designs.Length, cardNum);
 
-    /// <summary>
-    /// カードを生成
-    /// </summary>
-    /// <returns></returns>
-    public Card[] CreateCards(int cardNum, Vector2 cardSize) {
+        // カードを複数枚の作成
         var cards = new Card[cardNum];
         for(int i = 0; i < cards.Length; i++)
         {
-            cards[i] = CreateCard(cardSize);
+            var num = GetNonOverlappingValue(pairList);
+            cards[i] = CreateCard(num);
         }
         return cards;
     }
 
     /// <summary>
-    /// カードの番号を変更
+    /// カードの生成
     /// </summary>
-    /// <param name="number"></param>
-    /// <param name="card"></param>
-    /// <param name="cardSize"></param>
-    public void ChangeCardNumber(int number, Card card, Vector2 cardSize) {
-        var cardDesign = card.transform.GetChild(1).gameObject;
-        AttachImage(cardDesign, designs[number], cardSize);
+    /// <param name="number">
+    /// カード番号
+    /// </param>
+    /// <returns>
+    /// 単体のカード
+    /// </returns>
+    private Card CreateCard(int number) {
+        // 親オブジェクトの作成
+        var obj = Generator.Create("Card", transform);
+
+        // 「枠」の追加
+        Generator.Create("Frame", obj.transform, frameTex);
+
+        // 「柄」の追加
+        Generator.Create("Design", obj.transform, designs[number]).transform.rotation = Quaternion.Euler(Vector3.up * 180F);
+
+        // 「背面」の追加
+        Generator.Create("Back", obj.transform, backTex);
+
+        // カードに番号とサイズを割り振ってから返す
+        var card = obj.AddComponent<Card>();
         card.number = number + 1;
+        card.size = new Vector2(backTex.width, backTex.height);
+        return card;
+    }
+
+    /// <summary>
+    /// ペアリストの作成
+    /// </summary>
+    /// <param name="numLength">
+    /// 数列の長さ
+    /// </param>
+    /// <param name="cardMaxSize">
+    /// カードの最大数
+    /// </param>
+    /// <returns>
+    /// ペアリスト
+    /// </returns>
+    private List<int> MakePairNumbers(int numLength, int cardMaxSize) {
+        // 「柄の数」分の数列を作成
+        var rangeList = new List<int>();
+        for (int i = 0; i < numLength; i++)
+        {
+            rangeList.Add(i);
+        }
+
+        // 数列からペアになる番号の抽選
+        var pairNumbers = new List<int>();
+        for (var i = 0; i < cardMaxSize / 2; i++)
+        {
+            var num = GetNonOverlappingValue(rangeList);
+            pairNumbers.Add(num);
+            pairNumbers.Add(num);
+        }
+        return pairNumbers;
     }
 
 
     /// <summary>
-    /// カードのデザインを生成
+    /// リストから重複しない番号を抽選
     /// </summary>
-    /// <param name="designTex"></param>
-    private GameObject CreateCardDesign(Vector2 cardSize) {
-        // 親オブジェクトの作成
-        var card = CreateUI("Card", transform);
-
-        // 「枠」の追加
-        var frame = CreateUI("Frame", card.transform);
-        AttachImage(frame, frameTex, cardSize);
-
-        // 「柄」の追加
-        var design = CreateUI("Design", card.transform);
-        //AttachImage(design, designTex, cardSize);
-
-        // 「背面」の追加
-        var back = CreateUI("Back", card.transform);
-        AttachImage(back, backTex, cardSize);
-
-        return card;
+    /// <param name="list">
+    /// 整数リスト
+    /// </param>
+    /// <returns>
+    /// 重複しない値
+    /// </returns>
+    private int GetNonOverlappingValue(List<int> list) {
+        // ランダムに要素番号を選ぶ
+        var element = Random.Range(0, list.Count);
+        // リストから値を取り除く
+        element = list[element];
+        list.Remove(element);
+        return element;
     }
 }

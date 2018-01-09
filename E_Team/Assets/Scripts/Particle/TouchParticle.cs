@@ -1,15 +1,14 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-public class InputManager : MonoBehaviour
-{
+public class TouchParticle : MonoBehaviour {
 
     [SerializeField]
     GameObject CLICK_PARTICLE; // PS_TouchStarを割り当てること
 
-
     private GameObject m_ClickParticle;
-   
+
     private ParticleSystem m_ClickParticleSystem;
 
     // Use this for initialization
@@ -37,7 +36,7 @@ public class InputManager : MonoBehaviour
             // 左ボタンダウンを検知したら、マウスカーソル位置から破裂エフェクトとキラキラエフェクトを再生する。
             m_ClickParticle.transform.position = mousePosition;
             m_ClickParticleSystem.Play();   // １回再生(ParticleSystemのLoopingがfalseだから)
-           
+
         }
         if (Input.GetMouseButtonUp(0))
         {
