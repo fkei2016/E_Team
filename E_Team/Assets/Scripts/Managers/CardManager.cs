@@ -4,13 +4,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CardManager : SingletonMonoBehaviour<CardManager> {
 
     [SerializeField, Range(2, 6)]
-    private int pair = 3;
+    private int pairNum = 3;
     [SerializeField]
     private float cardRotaSpeed = 1F;
+
+    [Header("Enemy")]
+    [SerializeField]
+    private UnityEngine.UI.Text atkCount;
+    [SerializeField]
+    private TestAnimation anim;
 
     private bool turnFinish;
     private int keepPairNum;
@@ -20,6 +27,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private CardGenerator generator;
     private CardSpacement spacement;
     private Vector3[] cardPositions;
+
+    private Slider[] sliders;
 
     /// <summary>
     /// 開始時に処理
@@ -34,6 +43,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
         // カードの生成
         RemakeCards(false);
+
+        sliders = FindObjectsOfType<Slider>();
     }
 
     /// <summary>
@@ -42,7 +53,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private void Update() {
 
         // ペア数が変わったときに生成
-        if (keepPairNum != pair)
+        if (keepPairNum != pairNum)
         {
             RemakeCards();
         }
@@ -86,11 +97,32 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             turnFinish = false;
             while (pairCard.Count > 0)
             {
+                // カードのフェードアウト
                 var card = pairCard.Pop();
                 StartCoroutine(card.FadeOut(2F));
                 card.enabled = false;
                 remainingCards--;
+
+                // ペアの数だけダメージを与える
+                foreach (var slider in sliders)
+                {
+                    if(remainingCards % 2 == 0)
+                    {
+                        slider.value--;
+                    }
+                }
+                // 敵のダメージアニメーション
+                anim.PlayDamageAnimation();
             }
+
+            // 敵の攻撃カウンターとアニメーション
+            var count = int.Parse(atkCount.text);
+            if (count-- < 0)
+            {
+                count = 10;
+                anim.PlayAttackAnimation();
+            }
+            atkCount.text = (count).ToString();
         }
 
         if (!turnFinish && remainingCards <= 0)
@@ -148,11 +180,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // ペアカードを初期化
         pairCard.Clear();
 
-        // カードを生成
-        var cards = generator.CreateCards(cardNum);
-
         // 生成したカードを返す
-        return cards;
+        return generator.CreateCards(cardNum);
     }
 
     /// <summary>
@@ -172,7 +201,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         }
 
         // カードの再生成
-        useCards = MakeCards(pair * 2);
+        useCards = MakeCards(pairNum * 2);
         remainingCards = useCards.Length;
 
         // カード配置の生成と調整

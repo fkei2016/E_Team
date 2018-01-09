@@ -58,7 +58,7 @@ public static class Extension {
     /// <param name="call">
     /// イベント実行時の処理
     /// </param>
-    public static void AddEventTrigger(this GameObject gameObject, EventTriggerType type, EventCall call) {
+    public static EventTrigger AddEventTrigger(this GameObject gameObject, EventTriggerType type, EventCall call) {
         // "EventTrigger"コンポーネントの取得
         var trigger = gameObject.AttachComponet<EventTrigger>();
         // イベント実行時の処理を登録
@@ -67,5 +67,17 @@ public static class Extension {
         entry.callback.AddListener(call);
         // イベントの追加
         trigger.triggers.Add(entry);
+        return trigger;
+    }
+
+    public static Animation AddAnimationClip(this GameObject gameObject, string[] animationNames) {
+        // フェードアウトのアニメーションを追加
+        var anim = gameObject.AttachComponet<Animation>();
+        foreach (var name in animationNames)
+        {
+            var clip = (AnimationClip)Resources.Load(name);
+            anim.AddClip(clip, clip.name);
+        }
+        return anim;
     }
 }
