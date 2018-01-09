@@ -38,10 +38,7 @@ public class Card : MonoBehaviour {
             });
 
         // フェードアウトのアニメーションを追加
-        anim = gameObject.AttachComponet<Animation>();
-        var clip = (AnimationClip)Resources.Load("FadeOut");
-        anim.AddClip(clip, clip.name);
-        anim.clip = anim.GetClip(clip.name);
+        anim = gameObject.AddAnimationClip(new string[] { "FadeOut" });
     }
 
     /// <summary>
@@ -83,7 +80,7 @@ public class Card : MonoBehaviour {
     /// <summary>
     /// カードを閉じる
     /// </summary>
-    public IEnumerator Close(float waitTime = 1F) {
+    public IEnumerator Close(float waitTime = 0F) {
         yield return new WaitForSeconds(waitTime);
         rotateFlag = true;
         toRotation = 360F;
@@ -94,6 +91,6 @@ public class Card : MonoBehaviour {
     /// </summary>
     public IEnumerator FadeOut(float waitTime = 0F) {
         yield return new WaitForSeconds(waitTime);
-        anim.Play();
+        anim.Play("FadeOut");
     }
 }
