@@ -13,12 +13,6 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     [SerializeField]
     private float cardRotaSpeed = 1F;
 
-    [Header("Enemy")]
-    [SerializeField]
-    private UnityEngine.UI.Text atkCount;
-    [SerializeField]
-    private TestAnimation anim;
-
     private bool turnFinish;
     private int keepPairNum;
     private Card[] useCards;
@@ -27,8 +21,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private CardGenerator generator;
     private CardSpacement spacement;
     private Vector3[] cardPositions;
-
-    private Slider[] sliders;
+    private BattleManager battle;
 
     /// <summary>
     /// 開始時に処理
@@ -44,7 +37,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // カードの生成
         RemakeCards(false);
 
-        sliders = FindObjectsOfType<Slider>();
+        // バトルの管理者と連携
+        battle = BattleManager.instance;
     }
 
     /// <summary>
@@ -103,26 +97,15 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 card.enabled = false;
                 remainingCards--;
 
-                // ペアの数だけダメージを与える
-                foreach (var slider in sliders)
-                {
-                    if(remainingCards % 2 == 0)
-                    {
-                        slider.value--;
-                    }
-                }
-                // 敵のダメージアニメーション
-                anim.PlayDamageAnimation();
+                //  ペアの数だけ敵にダメージを与える
+                if(remainingCards % 2 == 0)
+                battle.TakeDamageToEnemy();
+                // スキル上昇
+                battle.SkillUp(1F);
             }
 
-            // 敵の攻撃カウンターとアニメーション
-            var count = int.Parse(atkCount.text);
-            if (count-- < 0)
-            {
-                count = 10;
-                anim.PlayAttackAnimation();
-            }
-            atkCount.text = (count).ToString();
+            // 敵の攻撃でプレイヤーにダメージを与える
+            battle.TakeDamageToPlayer(100F);
         }
 
         if (!turnFinish && remainingCards <= 0)
