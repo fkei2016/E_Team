@@ -21,6 +21,16 @@ public class Player : MonoBehaviour {
         set { basic.SetActive(value); }
     }
 
+    public bool click
+    {
+        get { return Input.GetMouseButtonDown(0); }
+    }
+
+    public Vector3 clickPosition
+    {
+        get { return Input.mousePosition; }
+    }
+
     /// <summary>
     /// 開始時に実行
     /// </summary>

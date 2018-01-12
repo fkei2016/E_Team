@@ -30,13 +30,6 @@ public class Card : MonoBehaviour {
         rotateFlag = false;
         toRotation = 0F;
 
-        // "EventTrigger"に"PointerDown"の処理を追加する
-        gameObject.AddEventTrigger(EventTriggerType.PointerDown,
-            data => {
-                if (back.activeSelf && !rotateFlag)
-                    Open();
-            });
-
         // フェードアウトのアニメーションを追加
         anim = gameObject.AddAnimationClip(new string[] { "FadeOut" });
     }
@@ -46,7 +39,7 @@ public class Card : MonoBehaviour {
     /// </summary>
     private void Update() {
         // 回転処理をかける
-        if(rotateFlag)
+        if (rotateFlag)
         {
             transform.Rotate(Vector3.up * rotaSpd);
             if (transform.localEulerAngles.y >= toRotation - rotaSpd)
@@ -92,5 +85,15 @@ public class Card : MonoBehaviour {
     public IEnumerator FadeOut(float waitTime = 0F) {
         yield return new WaitForSeconds(waitTime);
         anim.Play("FadeOut");
+    }
+
+    public void OnClick(Vector3 position) {
+        // カードの矩形とクリック座標の交点で判定
+        Rect rect = new Rect(transform.position.x - size.x / 2, transform.position.y - size.y / 2, size.x, size.y);
+        if (rect.Contains(position))
+        {
+            if (back.activeSelf && !rotateFlag)
+                Open();
+        }
     }
 }

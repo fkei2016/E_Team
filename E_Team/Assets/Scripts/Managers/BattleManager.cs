@@ -8,20 +8,34 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     [SerializeField]
     private Slider hp;
     
+    [SerializeField]
     private Enemy target;
+    [SerializeField]
     private Player[] users;
 
     private float tmpHP;
     private float damageSPD;
     private int turnNumber;
 
+    public Player activeUser
+    {
+        get
+        {
+            foreach(var user in users)
+            {
+                if(user.active)
+                {
+                    return user;
+                }
+            }
+            return null;
+        }
+    }
+
     /// <summary>
     /// 開始時に実行
     /// </summary>
     private void Start() {
-        target = FindObjectOfType<Enemy>();
-        users = FindObjectsOfType<Player>();
-
         tmpHP = hp.value;
         damageSPD = 2.5F;
         turnNumber = 0;
@@ -44,11 +58,25 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// 上昇値
     /// </param>
     public void SkillUp(float upper) {
+        activeUser.SkillUp(upper);
+    }
+
+    /// <summary>
+    /// ターン切り替え
+    /// </summary>
+    public void TurnChange() {
+        // ターン番号を更新
+        if(++turnNumber >= users.Length)
+        {
+            turnNumber = 0;
+        }
+
+        // 指定の番号のみアクティブにする
         foreach(var user in users)
         {
-            if (user.active)
-                user.SkillUp(upper);
+            user.active = false;
         }
+        users[turnNumber].active = true;
     }
 
     /// <summary>

@@ -84,6 +84,15 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             useCards[i].transform.position = Vector2.MoveTowards(useCards[i].transform.position, cardPositions[i], Time.deltaTime * 500F);
         }
 
+        // アクティブユーザーのクリック処理
+        if (battle.activeUser.click)
+        {
+            foreach (var card in useCards)
+            {
+                card.OnClick(battle.activeUser.clickPosition);
+            }
+        }
+
         // ターン交代のタイミング
         if (turnFinish || pairCard.Count >= remainingCards)
         {
@@ -95,17 +104,19 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 var card = pairCard.Pop();
                 StartCoroutine(card.FadeOut(2F));
                 card.enabled = false;
-                remainingCards--;
 
                 //  ペアの数だけ敵にダメージを与える
-                if(remainingCards % 2 == 0)
-                battle.TakeDamageToEnemy();
+                if (--remainingCards % 2 == 0)
+                    battle.TakeDamageToEnemy();
                 // スキル上昇
                 battle.SkillUp(1F);
             }
 
             // 敵の攻撃でプレイヤーにダメージを与える
             battle.TakeDamageToPlayer(100F);
+
+            // ターンの切り替え
+            battle.TurnChange();
         }
 
         if (!turnFinish && remainingCards <= 0)
