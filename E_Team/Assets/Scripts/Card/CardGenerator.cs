@@ -63,6 +63,8 @@ public class CardGenerator : MonoBehaviour {
         var card = obj.AddComponent<Card>();
         card.number = number + 1;
         card.size = new Vector2(backTex.width, backTex.height);
+
+
         return card;
     }
 

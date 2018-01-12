@@ -30,6 +30,11 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
     private Slider[] sliders;
 
+    
+    private int[] numlist;
+
+
+
     /// <summary>
     /// 開始時に処理
     /// </summary>
@@ -45,6 +50,17 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         RemakeCards(false);
 
         sliders = FindObjectsOfType<Slider>();
+
+        //---
+
+        if (PhotonNetwork.isMasterClient)
+        {
+            var prop = new ExitGames.Client.Photon.Hashtable();
+            prop.Add("usecards",numlist);
+            PhotonNetwork.room.SetCustomProperties(prop);
+        }
+        
+        //---
     }
 
     /// <summary>
@@ -70,7 +86,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         }
 
         // カード移動時のタッチ無効処理
-        if(useCards[0].transform.position == cardPositions[0])
+        if (useCards[0].transform.position == cardPositions[0])
         {
             if (!useCards[0].enabled)
             {
@@ -130,6 +146,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             // カードの再生成
             RemakeCards();
         }
+
     }
 
     /// <summary>
@@ -211,4 +228,13 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // ターンを変更
         turnFinish = false;
     }
+
+    [PunRPC]
+    private void MakeCards(ExitGames.Client.Photon.Hashtable _prop)
+    {
+        object value = null;
+
+    }
+
 }
+

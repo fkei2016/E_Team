@@ -607,6 +607,7 @@ GameObject:
   - component: {fileID: 2006379334}
   - component: {fileID: 2006379333}
   - component: {fileID: 2006379335}
+  - component: {fileID: 2006379336}
   m_Layer: 0
   m_Name: NetWork
   m_TagString: Untagged
@@ -665,6 +666,19 @@ MonoBehaviour:
   instantiationId: 1
   currentMasterID: -1
   isRuntimeInstantiated: 0
+--- !u!114 &2006379336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2006379332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1657280a88e840c4da1e52ddd70ec460, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CLICK_PARTICLE: {fileID: 1414299113293330, guid: 443d52a60c480fb449909207e3a021bb,
+    type: 2}
 --- !u!1 &2036976415
 GameObject:
   m_ObjectHideFlags: 0

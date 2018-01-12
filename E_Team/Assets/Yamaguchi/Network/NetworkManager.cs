@@ -11,7 +11,7 @@ public class NetworkManager : SingletonMonoBehaviour<NetworkManager> {
         get; private set;
     }
 
-    public static PhotonView photonview
+    public PhotonView photonview
     {
         get; private set;
     }
@@ -56,7 +56,8 @@ public class NetworkManager : SingletonMonoBehaviour<NetworkManager> {
         roomOptions.customRoomProperties = new Hashtable() { { "CustumProperties", "カスタムプロパティ" } };
         roomOptions.customRoomPropertiesForLobby = new string[] { "CustomProperties" };
         
-        PhotonNetwork.CreateRoom("Room", roomOptions, null);//ルームを生成し名前を指定
+        PhotonNetwork.CreateRoom("pRoom", roomOptions, null);//ルームを生成し名前を指定
+
     }
 
     //ルームから退室したプレイヤーが直前で行う処理
@@ -85,7 +86,6 @@ public class NetworkManager : SingletonMonoBehaviour<NetworkManager> {
         //Debug.Log("オーダー１");
         //networkorder.Order();
 
-        Debug.Log("プレイヤー全体に向けてオーダーしました");
         PhotonNetwork.LoadLevel("O_Test");
     }
 

@@ -37,4 +37,10 @@ MonoBehaviour:
   - RequestForPickupItems
   - RequestForPickupTimes
   - Networkorder
+  - SpawnOnNetwork
+  - MakeCards
+  - PlayTouchEffect
+  - PlayTouchDownEffect
+  - PlayTouchUpEffect
+  - PlayTouchEvent
   DisableAutoOpenWizard: 1

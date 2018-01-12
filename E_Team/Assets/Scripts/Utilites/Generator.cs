@@ -23,10 +23,25 @@ public class Generator : MonoBehaviour {
     static public GameObject Create(string name, Transform parent) {
         // オブジェクトを生成してUIに必要な設定をする
         var obj = new GameObject(name);
+
         obj.AddComponent<RectTransform>();
         obj.transform.Reset(parent, false);
         return obj;
     }
+
+
+    static public GameObject CreateNetworkObj(string name, Transform parent)
+    {
+
+        var gobj = PhotonNetwork.Instantiate(name, parent.position, parent.rotation, 0);
+
+        gobj.AddComponent<RectTransform>();
+        gobj.transform.Reset(parent, false);
+
+        return gobj;
+    }
+
+
 
     /// <summary>
     /// イメージの作成
@@ -62,8 +77,8 @@ public class Generator : MonoBehaviour {
         // テクスチャのサイズを取得
         var size = new Vector2(tex.width, tex.height);
 
-        // "Image"コンポーネントを取得
-        var image = owner.AttachComponet<Image>();
+       // "Image"コンポーネントを取得
+       var image = owner.AttachComponet<Image>();
         // サイズとスプライトの設定
         image.rectTransform.sizeDelta = size;
         image.sprite = Sprite.Create(tex, new Rect(Vector2.zero, size), Vector2.one * 0.5F);

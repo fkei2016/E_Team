@@ -15,7 +15,6 @@ public class hoge : Orderbace {
         //PhotonNetwork.LoadLevel("Title");
         //SceneManager.LoadScene("Title");
 
-        
         NetworkManager.instance.Order(this);
 
         this.gameObject.active = false;
