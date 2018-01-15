@@ -88,8 +88,10 @@ public class Card : MonoBehaviour {
     }
 
     public void OnClick(Vector3 position) {
+        var worldPosition = Camera.main.WorldToScreenPoint(transform.position);
+
         // カードの矩形とクリック座標の交点で判定
-        Rect rect = new Rect(transform.position.x - size.x / 2, transform.position.y - size.y / 2, size.x, size.y);
+        Rect rect = new Rect(worldPosition.x - size.x / 2, worldPosition.y - size.y / 2, size.x, size.y);
         if (rect.Contains(position))
         {
             if (back.activeSelf && !rotateFlag)

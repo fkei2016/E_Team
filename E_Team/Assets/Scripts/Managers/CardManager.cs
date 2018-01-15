@@ -12,6 +12,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private int pairNum = 3;
     [SerializeField]
     private float cardRotaSpeed = 1F;
+    [SerializeField]
+    private GameObject cardMask;
 
     private bool turnFinish;
     private int keepPairNum;
@@ -81,17 +83,27 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             useCards[i].rotaSpd = cardRotaSpeed;
 
             // カード配置までの線形補間
-            useCards[i].transform.position = Vector2.MoveTowards(useCards[i].transform.position, cardPositions[i], Time.deltaTime * 500F);
+            useCards[i].transform.position = Vector3.MoveTowards(useCards[i].transform.position, cardPositions[i], Time.deltaTime * 100F);
         }
 
-        // アクティブユーザーのクリック処理
-        if (battle.activeUser.click)
+        // [Debug]シングルプレイテスト用
+        if (Input.GetMouseButtonDown(0) && !cardMask.activeSelf)
         {
             foreach (var card in useCards)
             {
-                card.OnClick(battle.activeUser.clickPosition);
+                if(card.gameObject.activeSelf)
+                card.OnClick(Input.mousePosition);
             }
         }
+
+        //// アクティブユーザーのクリック処理
+        //if (battle.activeUser.click)
+        //{
+        //    foreach (var card in useCards)
+        //    {
+        //        card.OnClick(battle.activeUser.clickPosition);
+        //    }
+        //}
 
         // ターン交代のタイミング
         if (turnFinish || pairCard.Count >= remainingCards)
@@ -105,18 +117,18 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 StartCoroutine(card.FadeOut(2F));
                 card.enabled = false;
 
-                //  ペアの数だけ敵にダメージを与える
-                if (--remainingCards % 2 == 0)
-                    battle.TakeDamageToEnemy();
-                // スキル上昇
-                battle.SkillUp(1F);
+                ////  ペアの数だけ敵にダメージを与える
+                //if (--remainingCards % 2 == 0)
+                //    battle.TakeDamageToEnemy();
+                //// スキル上昇
+                //battle.SkillUp(1F);
             }
 
-            // 敵の攻撃でプレイヤーにダメージを与える
-            battle.TakeDamageToPlayer(100F);
+            //// 敵の攻撃でプレイヤーにダメージを与える
+            //battle.TakeDamageToPlayer(100F);
 
-            // ターンの切り替え
-            battle.TurnChange();
+            //// ターンの切り替え
+            //battle.TurnChange();
         }
 
         if (!turnFinish && remainingCards <= 0)
