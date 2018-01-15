@@ -38,32 +38,46 @@ public class TouchParticle : MonoBehaviour {
         }
     }
 
+    /// <summary>
+    /// パーティクルの発生
+    /// </summary>
+    /// <param name="worldPosition">
+    /// ワールド座標
+    /// </param>
+    /// <param name="depth">
+    /// ワールドの深度
+    /// </param>
     public void Emission(Vector3 worldPosition, float depth = 0F) {
         // パーティクルをマウスカーソルに追従させる
         var mousePosition = Camera.main.ScreenToWorldPoint(worldPosition + Vector3.forward * depth);
 
-        // テーブルに"position"を再登録
-        table.Remove("position");
-        table.Add("position", mousePosition);
+        if (NetworkManager.instance)
+        {
+            // テーブルに"position"を再登録
+            table.Remove("position");
+            table.Add("position", mousePosition);
 
-        //PhotonViewを通して全プレイヤーにPlayTouchEventを実行させる
-        this.GetComponent<PhotonView>().RPC("PlayTouchEvent", PhotonTargets.All, table);//変数同期の時はHashTableを追加してください
+            //PhotonViewを通して全プレイヤーにPlayTouchEventを実行させる
+            NetworkManager.instance.photonview.RPC("PlayTouchEvent", PhotonTargets.All, table);//変数同期の時はHashTableを追加してください
+        }
+        else
+        {
+            m_ClickParticleSystem.transform.position = mousePosition;
+        }
 
+        // 左ボタンダウンを検知したら、マウスカーソル位置から破裂エフェクトとキラキラエフェクトを再生する。 
+        m_ClickParticleSystem.Play();   // １回再生(ParticleSystemのLoopingがfalseだから)
     }
 
     [PunRPC]
     private void PlayTouchEvent(ExitGames.Client.Photon.Hashtable _table)
     {
-
         object value = null;
         //HashTableに追加された変数を同期します
         if (_table.TryGetValue("position", out value))
         {
             m_ClickParticleSystem.transform.position = (Vector3)value;
         }
-
-        // 左ボタンダウンを検知したら、マウスカーソル位置から破裂エフェクトとキラキラエフェクトを再生する。 
-        m_ClickParticleSystem.Play();   // １回再生(ParticleSystemのLoopingがfalseだから)
     }
 
 }

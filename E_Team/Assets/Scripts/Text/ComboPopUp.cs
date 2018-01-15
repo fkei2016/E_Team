@@ -28,11 +28,6 @@ public class ComboPopUp : MonoBehaviour
     public Vector3 PopupPosition;
 
     /// <summary>
-    /// 1文字の幅
-    /// </summary>
-    public float PopupTextWidth;
-
-    /// <summary>
     /// ポップアップの実行
     /// </summary>
     public void Popup()
@@ -48,12 +43,13 @@ public class ComboPopUp : MonoBehaviour
         var pos = this.PopupPosition;
         var texts = new List<Combo>();
 
-        var root = new GameObject();
+        var root = new GameObject("ComboString");
         //root.AddComponent<RectTransform>();
         var canvasGroup = root.AddComponent<CanvasGroup>();
-        root.transform.SetParent(this.TargetCanvas.transform);
-        root.transform.localPosition = Vector3.zero;
-        root.transform.localScale=Vector3.one;
+        root.transform.Reset(TargetCanvas.transform);
+        //root.transform.SetParent(this.TargetCanvas.transform);
+        //root.transform.localPosition = Vector3.zero;
+        //root.transform.localScale=Vector3.one;
         //root.GetComponent<RectTransform>().anchorMin = Vector2.zero;
         //root.GetComponent<RectTransform>().anchorMax = Vector2.zero;
         //root.transform.localPosition = Vector3.zero;
@@ -62,35 +58,37 @@ public class ComboPopUp : MonoBehaviour
         //print("aaa= " + root.GetComponent<RectTransform>().transform.localPosition);
         //root.GetComponent<RectTransform>().transform.localPosition = Vector3.zero;
 
-
-
+        // 文字幅の計算
+        var fontSize = (PopupTextObject.GetComponent<Text>().fontSize * 0.7F);
         //var canvasGroup = root.AddComponent<CanvasGroup>();
         //print(PopupString.Length);
         //文字中央寄せ
-        pos.x = pos.x - ((PopupString.Length-1) / 2 * this.PopupTextWidth);
+        pos.x = pos.x - ((PopupString.Length-1) / 2 * fontSize);
         foreach (var s in this.PopupString)
         {
-            var obj = new GameObject();
+            var obj = new GameObject("ValueText");
+            obj.transform.Reset(pos, Quaternion.identity, Vector3.one, root.transform);
             //obj.AddComponent<RectTransform>();
-            obj.transform.SetParent(root.transform);
-            obj.transform.localPosition = pos;
-            obj.transform.localScale = Vector3.one;
+            //obj.transform.SetParent(root.transform);
+            //obj.transform.localPosition = pos;
+            //obj.transform.localScale = Vector3.one;
 
 
             // 1文字ずつ生成
             var valueText = Instantiate(this.PopupTextObject, Vector3.zero, Quaternion.identity);
             var textComp = valueText.GetComponent<Text>();
             textComp.text = s.ToString();
-            valueText.transform.SetParent(obj.transform);
-            valueText.transform.localPosition = Vector3.zero;
-            valueText.transform.localScale = Vector3.one;
+            valueText.transform.Reset(obj.transform);
+            //valueText.transform.SetParent(obj.transform);
+            //valueText.transform.localPosition = Vector3.zero;
+            //valueText.transform.localScale = Vector3.one;
             texts.Add(valueText.GetComponent<Combo>());
 
             // 0.03秒待つ(適当)
             yield return new WaitForSeconds(0.03f);
 
             // 次の位置
-            pos.x += this.PopupTextWidth;
+            pos.x += fontSize;
         }
 
         // 適当に待ち

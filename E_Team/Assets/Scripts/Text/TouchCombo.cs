@@ -15,9 +15,13 @@ public class TouchCombo : MonoBehaviour
     /// </summary>
     public GameObject PopupText;
 
+    /// <summary>
+    /// ポップアップする文字列
+    /// </summary>
+    public string PopupString = "Combo";
 
-    //コンボ数
-    public int ComboCount;
+    ////コンボ数
+    //public int ComboCount;
 
     // Use this for initialization
     void Start()
@@ -30,15 +34,27 @@ public class TouchCombo : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            var temp = new GameObject();
-            temp.transform.position = Vector3.zero;
-            ComboPopUp gen = temp.AddComponent<ComboPopUp>();
-            gen.PopupString = ComboCount.ToString() + "combo";
-            gen.PopupPosition = Input.mousePosition; 
-            gen.PopupTextWidth = 30.0f;
-            gen.TargetCanvas = this.TargetCanvas;
-            gen.PopupTextObject = this.PopupText;
-            gen.Popup();
+            Emission(Input.mousePosition);
         }
+    }
+
+    /// <summary>
+    /// パーティクルの発生
+    /// </summary>
+    /// <param name="worldPosition">
+    /// ワールド座標
+    /// </param>
+    public void Emission(Vector3 worldPosition)
+    {
+        var temp = new GameObject("Combo");
+        temp.transform.position = Vector3.zero;
+
+        var gen = temp.AddComponent<ComboPopUp>();
+        gen.PopupString = PopupString;
+        gen.PopupPosition = worldPosition;
+        //gen.PopupTextWidth = 30.0f;
+        gen.TargetCanvas = this.TargetCanvas;
+        gen.PopupTextObject = this.PopupText;
+        gen.Popup();
     }
 }
