@@ -13,7 +13,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     [SerializeField]
     private float cardRotaSpeed = 1F;
     [SerializeField]
-    private GameObject cardMask;
+    private Image cardMask;
 
     private bool turnFinish;
     private int keepPairNum;
@@ -47,6 +47,11 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     /// 更新時に処理
     /// </summary>
     private void Update() {
+        // [Debug]ブレイクポイント
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Break();
+        }
 
         // ペア数が変わったときに生成
         if (keepPairNum != pairNum)
@@ -87,7 +92,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         }
 
         // [Debug]シングルプレイテスト用
-        if (Input.GetMouseButtonDown(0) && !cardMask.activeSelf)
+        if (Input.GetMouseButtonDown(0) && !cardMask.gameObject.activeSelf)
         {
             foreach (var card in useCards)
             {
@@ -116,6 +121,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 var card = pairCard.Pop();
                 StartCoroutine(card.FadeOut(2F));
                 card.enabled = false;
+                --remainingCards;
 
                 ////  ペアの数だけ敵にダメージを与える
                 //if (--remainingCards % 2 == 0)
@@ -165,6 +171,10 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             }
             else
             {
+                // ペア成立のエフェクト
+                var comboFX = GetComponent<TouchCombo>();
+                StartCoroutine(comboFX.Emission(card1.transform));
+                StartCoroutine(comboFX.Emission(card2.transform));
                 // 成立したペアをスタック
                 pairCard.Push(card1);
                 pairCard.Push(card2);
