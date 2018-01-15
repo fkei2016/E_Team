@@ -5,7 +5,6 @@ using System.Collections.Generic;
 
 public class ComboPopUp : MonoBehaviour
 {
-
     /// <summary>
     /// 出力先キャンバス
     /// </summary>

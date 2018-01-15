@@ -20,7 +20,7 @@ public class TouchParticle : MonoBehaviour {
     void Start()
     {
         // パーティクルを生成
-        m_ClickParticle = (GameObject)Instantiate(CLICK_PARTICLE);
+        m_ClickParticle = (GameObject)Instantiate(CLICK_PARTICLE, transform);
 
         // パーティクルの再生停止を制御するためにコンポーネントを取得
         m_ClickParticleSystem = m_ClickParticle.GetComponent<ParticleSystem>();
