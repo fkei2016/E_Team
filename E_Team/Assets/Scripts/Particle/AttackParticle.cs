@@ -25,6 +25,29 @@ public class AttackParticle : MonoBehaviour {
     [SerializeField]
     private iTween.EaseType easetype;
 
+    [SerializeField]
+    private ParticleSystem wildfire;
+
+    [SerializeField]
+    private ParticleSystem explosion;
+
+    //パーティクルのサイズ
+    [SerializeField]
+    private float particleSize = 1.0f;
+
+    public float ParticleSize
+    {
+        set
+        {
+            particleSize = value;
+            GetComponent<ParticleSystem>().startSize = particleSize;
+        }
+        get
+        {
+            return particleSize;
+        }
+    }
+
     // Use this for initialization
     void Start () {
 		
@@ -32,6 +55,9 @@ public class AttackParticle : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+
+
+        GetComponent<ParticleSystem>().startSize = particleSize;
 
         //巡回
         if (!attackFlag)
@@ -42,7 +68,6 @@ public class AttackParticle : MonoBehaviour {
                 Hashtable table = new Hashtable();
                 table.Add("easeType", easetype);
                 var targetSpriteSize = fourCornerTarget.GetComponent<SpriteRenderer>().bounds.size / 2;
-                print(targetSpriteSize);
                 table.Add("x", fourCornerTarget.transform.position.x - targetSpriteSize.x + fourCorners[patrol].x - fourCornerTarget.transform.position.x / 10.0f + 0.1f);
                 table.Add("y", fourCornerTarget.transform.position.y + targetSpriteSize.y - fourCorners[patrol].y - fourCornerTarget.transform.position.y / 10.0f - 0.1f);
                 table.Add("time", 1.0f);
@@ -54,6 +79,7 @@ public class AttackParticle : MonoBehaviour {
         //攻撃
         if (attackFlag)
         {
+            wildfire.gameObject.SetActive(true);
             Hashtable table = new Hashtable();
             table.Add("easeType", easetype);
             table.Add("x", target.transform.position.x);
@@ -74,6 +100,7 @@ public class AttackParticle : MonoBehaviour {
 
     void attackDestroy()
     {
-        Destroy(this.gameObject);
+        explosion.gameObject.SetActive(true);
+        Destroy(this.gameObject,1.0f);
     }
 }
