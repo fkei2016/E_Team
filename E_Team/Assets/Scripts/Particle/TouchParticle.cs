@@ -8,13 +8,11 @@ public class TouchParticle : MonoBehaviour {
     GameObject CLICK_PARTICLE; // PS_TouchStarを割り当てること
 
     private GameObject m_ClickParticle;
-
     private ParticleSystem m_ClickParticleSystem;
 
 
     //追加--
     ExitGames.Client.Photon.Hashtable table;//ハッシュテーブル
-   
     
     // Use this for initialization
     void Start()
@@ -27,6 +25,7 @@ public class TouchParticle : MonoBehaviour {
         m_ClickParticleSystem.Stop();
 
         table = new ExitGames.Client.Photon.Hashtable();
+
 
     }
 
@@ -49,7 +48,7 @@ public class TouchParticle : MonoBehaviour {
             table.Add("position", mousePosition);//テーブル内の"position"を追加する
 
             //PhotonViewを通して全プレイヤーにPlayTouchEventを実行させる
-            this.GetComponent<PhotonView>().RPC("PlayTouchEvent", PhotonTargets.All,table);//変数同期の時はHashTableを追加してください
+            NetworkManager.instance.photonview.RPC("PlayTouchEvent", PhotonTargets.AllViaServer,table);//変数同期の時はHashTableを追加してください
 
         }
     }

@@ -14,6 +14,7 @@ public class CardGenerator : MonoBehaviour {
     [SerializeField]
     private Texture2D[] designs;
 
+     
     /// <summary>
     /// カードを生成
     /// </summary>
@@ -24,8 +25,11 @@ public class CardGenerator : MonoBehaviour {
     /// 複数のカード
     /// </returns>
     public Card[] CreateCards(int cardNum) {
-        // ペアリストの作成
+
         var pairList = MakePairNumbers(designs.Length, cardNum);
+
+        // ペアリストの作成
+        pairList = MakePairNumbers(designs.Length, cardNum);
 
         // カードを複数枚の作成
         var cards = new Card[cardNum];
@@ -46,7 +50,7 @@ public class CardGenerator : MonoBehaviour {
     /// <returns>
     /// 単体のカード
     /// </returns>
-    private Card CreateCard(int number) {
+    public Card CreateCard(int number) {
         // 親オブジェクトの作成
         var obj = Generator.Create("Card", transform);
 
@@ -63,7 +67,6 @@ public class CardGenerator : MonoBehaviour {
         var card = obj.AddComponent<Card>();
         card.number = number + 1;
         card.size = new Vector2(backTex.width, backTex.height);
-
 
         return card;
     }
@@ -99,7 +102,6 @@ public class CardGenerator : MonoBehaviour {
         return pairNumbers;
     }
 
-
     /// <summary>
     /// リストから重複しない番号を抽選
     /// </summary>
@@ -117,4 +119,5 @@ public class CardGenerator : MonoBehaviour {
         list.Remove(element);
         return element;
     }
+
 }

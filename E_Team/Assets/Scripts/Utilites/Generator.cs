@@ -30,19 +30,6 @@ public class Generator : MonoBehaviour {
     }
 
 
-    static public GameObject CreateNetworkObj(string name, Transform parent)
-    {
-
-        var gobj = PhotonNetwork.Instantiate(name, parent.position, parent.rotation, 0);
-
-        gobj.AddComponent<RectTransform>();
-        gobj.transform.Reset(parent, false);
-
-        return gobj;
-    }
-
-
-
     /// <summary>
     /// イメージの作成
     /// </summary>

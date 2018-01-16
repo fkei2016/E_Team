@@ -21,10 +21,10 @@ public class NetworkManager : SingletonMonoBehaviour<NetworkManager> {
     protected override void Awake()
     {
         base.Awake();
-        photonview = this.GetComponent<PhotonView>();
+        photonview = FindObjectOfType<PhotonView>();
         DontDestroyOnLoad(photonview);
 
-        PhotonNetwork.ConnectUsingSettings(null);
+        PhotonNetwork.ConnectUsingSettings("ver1.0");
     }
 
     void OnJoinedLobby()
@@ -52,11 +52,8 @@ public class NetworkManager : SingletonMonoBehaviour<NetworkManager> {
         roomOptions = new RoomOptions();
         roomOptions.IsVisible = true;
         roomOptions.IsOpen = true;
-        roomOptions.maxPlayers = 4;
-        roomOptions.customRoomProperties = new Hashtable() { { "CustumProperties", "カスタムプロパティ" } };
-        roomOptions.customRoomPropertiesForLobby = new string[] { "CustomProperties" };
-        
-        PhotonNetwork.CreateRoom("pRoom", roomOptions, null);//ルームを生成し名前を指定
+
+        PhotonNetwork.CreateRoom("pRoom2", roomOptions, null);//ルームを生成し名前を指定
 
     }
 
@@ -74,19 +71,21 @@ public class NetworkManager : SingletonMonoBehaviour<NetworkManager> {
     public void Order(Orderbace _order)
     {
         networkorder = _order;
-        this.GetComponent<PhotonView>().RPC("Networkorder", PhotonTargets.All);
+        photonview.RPC("Networkorder", PhotonTargets.All);
     }
 
     [PunRPC]
     private void Networkorder()
     {
-        //if (!PhotonNetwork.isMasterClient)
-        //    return;
-
-        //Debug.Log("オーダー１");
-        //networkorder.Order();
-
+        
         PhotonNetwork.LoadLevel("O_Test");
+    }
+
+    private void Update()
+    {
+
+        //Debug.Log(PhotonNetwork.playerList[0].name);
+
     }
 
 }

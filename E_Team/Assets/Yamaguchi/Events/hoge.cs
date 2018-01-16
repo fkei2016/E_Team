@@ -12,18 +12,15 @@ public class hoge : Orderbace {
     // Update is called once per frame
     void Update ()
     {
-        //PhotonNetwork.LoadLevel("Title");
-        //SceneManager.LoadScene("Title");
-
+        if(PhotonNetwork.isMasterClient)
         NetworkManager.instance.Order(this);
+
 
         this.gameObject.active = false;
     }
     
     override public void Order()
     {
-        Debug.Log("オーダー2");
-        //SceneManager.LoadScene("O_Test");
         PhotonNetwork.LoadLevel("O_Test");
     }
 
