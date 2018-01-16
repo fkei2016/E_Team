@@ -6,6 +6,8 @@ using UnityEngine.UI;
 public class Enemy : MonoBehaviour {
 
     [SerializeField]
+    private int maxHp;
+    [SerializeField]
     private int maxAtk;
 
     private Animation anim;
@@ -19,6 +21,8 @@ public class Enemy : MonoBehaviour {
         anim = GetComponentInChildren<Animation>();
         hp = GetComponentInChildren<Slider>();
         atk = GetComponentInChildren<Text>();
+
+        hp.maxValue = maxHp;
         ResetATK();
     }
 
