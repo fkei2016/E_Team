@@ -74,10 +74,14 @@ public class Player : MonoBehaviour {
     /// スキル発動
     /// </summary>
     public void SkillActivation() {
-        if (skillGauge >= 1F)
+        if (active && skillGauge >= 1F)
         {
             skillTmp = 0F;
-            Debug.Log("Skill!");
+            Debug.Log("Use Skill !!");
+        }
+        else
+        {
+            Debug.Log("Dont use Skill...");
         }
     }
 }

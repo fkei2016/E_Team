@@ -91,24 +91,24 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             useCards[i].transform.position = Vector3.MoveTowards(useCards[i].transform.position, cardPositions[i], Time.deltaTime * 100F);
         }
 
-        // [Debug]シングルプレイテスト用
-        if (Input.GetMouseButtonDown(0) && !cardMask.gameObject.activeSelf)
-        {
-            foreach (var card in useCards)
-            {
-                if(card.gameObject.activeSelf)
-                card.OnClick(Input.mousePosition);
-            }
-        }
-
-        //// アクティブユーザーのクリック処理
-        //if (battle.activeUser.click)
+        //// [Debug]シングルプレイテスト用
+        //if (Input.GetMouseButtonDown(0) && !cardMask.gameObject.activeSelf)
         //{
         //    foreach (var card in useCards)
         //    {
-        //        card.OnClick(battle.activeUser.clickPosition);
+        //        if(card.gameObject.activeSelf)
+        //        card.OnClick(Input.mousePosition);
         //    }
         //}
+
+        // アクティブユーザーのクリック処理
+        if (battle.activeUser.click)
+        {
+            foreach (var card in useCards)
+            {
+                card.OnClick(battle.activeUser.clickPosition);
+            }
+        }
 
         // ターン交代のタイミング
         if (turnFinish || pairCard.Count >= remainingCards)
@@ -122,18 +122,18 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 StartCoroutine(card.FadeOut(2F));
                 --remainingCards;
 
-                ////  ペアの数だけ敵にダメージを与える
-                //if (--remainingCards % 2 == 0)
-                //    battle.TakeDamageToEnemy();
-                //// スキル上昇
-                //battle.SkillUp(1F);
+                //  ペアの数だけ敵にダメージを与える
+                if (remainingCards % 2 == 0)
+                    battle.TakeDamageToEnemy();
+                // スキル上昇
+                battle.SkillUp(1F);
             }
 
-            //// 敵の攻撃でプレイヤーにダメージを与える
-            //battle.TakeDamageToPlayer(100F);
+            // 敵の攻撃でプレイヤーにダメージを与える
+            battle.TakeDamageToPlayer(100F);
 
-            //// ターンの切り替え
-            //battle.TurnChange();
+            // ターンの切り替え
+            battle.TurnChange();
         }
 
         foreach(var card in useCards)

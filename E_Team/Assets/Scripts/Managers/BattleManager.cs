@@ -9,7 +9,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     private Slider hp;
     
     [SerializeField]
-    private Enemy target;
+    private Enemy[] target;
     [SerializeField]
     private Player[] users;
 
@@ -84,9 +84,9 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// </summary>
     /// <param name="damage"></param>
     public void TakeDamageToEnemy() {
-        var takeDown = target.TakeDamage();
+        var takeDown = target[0].TakeDamage();
         //target.gameObject.SetActive(takeDown);
-        target.PlayDamageAnimation();
+        target[0].PlayDamageAnimation();
     }
 
     /// <summary>
@@ -96,9 +96,9 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// ダメージ値
     /// </param>
     public void TakeDamageToPlayer(float damage) {
-        if (target.AtkCountDown())
+        if (target[0].AtkCountDown())
         {
-            target.PlayAttackAnimation();
+            target[0].PlayAttackAnimation();
             tmpHP -= damage;
         }
     }

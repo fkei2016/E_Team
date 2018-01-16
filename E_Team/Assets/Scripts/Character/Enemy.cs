@@ -8,17 +8,17 @@ public class Enemy : MonoBehaviour {
     [SerializeField]
     private int maxAtk;
 
+    private Animation anim;
     private Slider hp;
     private Text atk;
-    private Animation anim;
 
     /// <summary>
     /// 開始時に実行
     /// </summary>
     private void Start() {
+        anim = GetComponentInChildren<Animation>();
         hp = GetComponentInChildren<Slider>();
         atk = GetComponentInChildren<Text>();
-        anim = GetComponentInChildren<Animation>();
         ResetATK();
     }
 
