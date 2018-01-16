@@ -20,9 +20,10 @@ public class TouchCombo : MonoBehaviour
     /// <summary>
     /// パーティクルの発生
     /// </summary>
-    /// <param name="worldPosition">
-    /// ワールド座標
+    /// <param name="target">
+    /// 表示するトランスフォーム
     /// </param>
+    /// <returns></returns>
     public IEnumerator Emission(Transform target)
     {
         yield return new WaitForSeconds(1F);
