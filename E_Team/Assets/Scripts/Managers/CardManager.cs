@@ -120,7 +120,6 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 // カードのフェードアウト
                 var card = pairCard.Pop();
                 StartCoroutine(card.FadeOut(2F));
-                card.enabled = false;
                 --remainingCards;
 
                 ////  ペアの数だけ敵にダメージを与える
@@ -135,6 +134,11 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
             //// ターンの切り替え
             //battle.TurnChange();
+        }
+
+        foreach(var card in useCards)
+        {
+            if(!card.isFinish) return;
         }
 
         if (!turnFinish && remainingCards <= 0)
@@ -165,6 +169,10 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
             if (turnFinish)
             {
+                // ペア不成立のエフェクト
+                var missFX = GetComponent<MissEffect>();
+                StartCoroutine(missFX.Emission(card1.transform));
+                StartCoroutine(missFX.Emission(card2.transform));
                 // カードを閉じる
                 StartCoroutine(card1.Close(1.5F));
                 StartCoroutine(card2.Close(1.5F));
