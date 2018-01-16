@@ -12,7 +12,7 @@ public class JumpToScene : MonoBehaviour {
     /// <summary>
     /// シーン遷移の実行
     /// </summary>
-    void Execute() {
+    public void Execute() {
         SceneManager.LoadScene(sceneName);
     }
 }
