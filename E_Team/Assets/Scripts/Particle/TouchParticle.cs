@@ -7,8 +7,6 @@ public class TouchParticle : MonoBehaviour {
     [SerializeField]
     GameObject CLICK_PARTICLE; // PS_TouchStarを割り当てること
 
-    private GameObject m_ClickParticle;
-
     private ParticleSystem m_ClickParticleSystem;
 
 
@@ -20,10 +18,10 @@ public class TouchParticle : MonoBehaviour {
     void Start()
     {
         // パーティクルを生成
-        m_ClickParticle = (GameObject)Instantiate(CLICK_PARTICLE, transform);
+        var particle = Instantiate(CLICK_PARTICLE, transform);
 
         // パーティクルの再生停止を制御するためにコンポーネントを取得
-        m_ClickParticleSystem = m_ClickParticle.GetComponent<ParticleSystem>();
+        m_ClickParticleSystem = particle.GetComponent<ParticleSystem>();
 
         table = new ExitGames.Client.Photon.Hashtable();
     }

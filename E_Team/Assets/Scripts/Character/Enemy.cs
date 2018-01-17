@@ -22,8 +22,17 @@ public class Enemy : MonoBehaviour {
         hp = GetComponentInChildren<Slider>();
         atk = GetComponentInChildren<Text>();
 
-        hp.maxValue = maxHp;
+        // 値を初期化
+        ResetHP();
         ResetATK();
+    }
+
+    /// <summary>
+    /// 体力値をリセット
+    /// </summary>
+    private void ResetHP() {
+        hp.maxValue = maxHp;
+        hp.value = hp.maxValue;
     }
 
     /// <summary>

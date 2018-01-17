@@ -14,6 +14,11 @@ public class CardGenerator : MonoBehaviour {
     [SerializeField]
     private Texture2D[] designs;
 
+    public int maxDesign
+    {
+        get { return designs.Length; }
+    }
+
     /// <summary>
     /// カードを生成
     /// </summary>

@@ -21,6 +21,8 @@ public class Player : MonoBehaviour {
         set { basic.SetActive(value); }
     }
 
+    public int number;
+
     public bool click
     {
         get { return Input.GetMouseButtonDown(0); }

@@ -234,7 +234,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // カードの再生成
         useCards = MakeCards(pairNum * 2);
         // [Master]ペアリストの生成
-        var list = generator.MakePairList(13, useCards.Length);
+        var list = generator.MakePairList(generator.maxDesign, useCards.Length);
         var array = new List<int>();
         for(int i = 0; i < useCards.Length; i++)
         {
