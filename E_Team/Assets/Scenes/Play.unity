@@ -241,7 +241,6 @@ MonoBehaviour:
   target:
   - {fileID: 1255921964}
   users:
-  - {fileID: 0}
   - {fileID: 135649864}
   - {fileID: 702479765}
   - {fileID: 255215914}
@@ -296,6 +295,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebd07324d903f604ca976919dc1302c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  number: 0
 --- !u!114 &135649865
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -304,24 +304,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 135649862}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Script: {fileID: 11500000, guid: 1657280a88e840c4da1e52ddd70ec460, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ownerId: 0
-  group: 0
-  OwnerShipWasTransfered: 0
-  prefixBackup: -1
-  synchronization: 3
-  onSerializeTransformOption: 3
-  onSerializeRigidBodyOption: 2
-  ownershipTransfer: 0
-  ObservedComponents:
-  - {fileID: 37863505}
-  ObservedComponentsFoldoutOpen: 1
-  viewIdField: 1
-  instantiationId: 1
-  currentMasterID: -1
-  isRuntimeInstantiated: 0
+  CLICK_PARTICLE: {fileID: 1414299113293330, guid: 443d52a60c480fb449909207e3a021bb,
+    type: 2}
 --- !u!1 &192640271
 GameObject:
   m_ObjectHideFlags: 0
@@ -508,6 +495,7 @@ GameObject:
   m_Component:
   - component: {fileID: 255215913}
   - component: {fileID: 255215914}
+  - component: {fileID: 255215915}
   m_Layer: 5
   m_Name: Player (2)
   m_TagString: Untagged
@@ -548,6 +536,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebd07324d903f604ca976919dc1302c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  number: 2
+--- !u!114 &255215915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 255215912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1657280a88e840c4da1e52ddd70ec460, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CLICK_PARTICLE: {fileID: 1414299113293330, guid: 443d52a60c480fb449909207e3a021bb,
+    type: 2}
 --- !u!1 &259082918
 GameObject:
   m_ObjectHideFlags: 0
@@ -857,7 +859,7 @@ GameObject:
   - component: {fileID: 371293833}
   - component: {fileID: 371293832}
   m_Layer: 5
-  m_Name: CliantCanvas
+  m_Name: CardCanvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -937,7 +939,7 @@ RectTransform:
   - {fileID: 607358007}
   - {fileID: 1593254656}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -1020,7 +1022,6 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 432490851}
-  - component: {fileID: 432490850}
   m_Layer: 0
   m_Name: TouchParticle
   m_TagString: Untagged
@@ -1028,19 +1029,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &432490850
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 432490849}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1657280a88e840c4da1e52ddd70ec460, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  CLICK_PARTICLE: {fileID: 1414299113293330, guid: 443d52a60c480fb449909207e3a021bb,
-    type: 2}
 --- !u!4 &432490851
 Transform:
   m_ObjectHideFlags: 0
@@ -1481,6 +1469,7 @@ GameObject:
   m_Component:
   - component: {fileID: 702479764}
   - component: {fileID: 702479765}
+  - component: {fileID: 702479766}
   m_Layer: 5
   m_Name: Player (1)
   m_TagString: Untagged
@@ -1496,7 +1485,7 @@ RectTransform:
   m_GameObject: {fileID: 702479763}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.75, y: 0.75, z: 0.9999891}
+  m_LocalScale: {x: 0.75, y: 0.75, z: 1}
   m_Children:
   - {fileID: 1747379746}
   - {fileID: 1432656557}
@@ -1521,6 +1510,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebd07324d903f604ca976919dc1302c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  number: 1
+--- !u!114 &702479766
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 702479763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1657280a88e840c4da1e52ddd70ec460, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CLICK_PARTICLE: {fileID: 1414299113293330, guid: 443d52a60c480fb449909207e3a021bb,
+    type: 2}
 --- !u!1 &764278350
 GameObject:
   m_ObjectHideFlags: 0
@@ -1996,6 +1999,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d35229514a3c0b4d88986ee89b991b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxHp: 1000
   maxAtk: 10
 --- !u!1 &1273334071
 GameObject:
@@ -2238,7 +2242,7 @@ RectTransform:
   - {fileID: 1445825801}
   - {fileID: 209461027}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -2737,6 +2741,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1528247249}
   - component: {fileID: 1528247250}
+  - component: {fileID: 1528247251}
   m_Layer: 5
   m_Name: Player (3)
   m_TagString: Untagged
@@ -2752,7 +2757,7 @@ RectTransform:
   m_GameObject: {fileID: 1528247248}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.75, y: 0.75, z: 0.9999891}
+  m_LocalScale: {x: 0.75, y: 0.75, z: 1}
   m_Children:
   - {fileID: 247369683}
   - {fileID: 1755432139}
@@ -2777,6 +2782,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ebd07324d903f604ca976919dc1302c1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  number: 3
+--- !u!114 &1528247251
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1528247248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1657280a88e840c4da1e52ddd70ec460, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CLICK_PARTICLE: {fileID: 1414299113293330, guid: 443d52a60c480fb449909207e3a021bb,
+    type: 2}
 --- !u!1 &1531992787
 GameObject:
   m_ObjectHideFlags: 0
@@ -3249,6 +3268,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dontDestory: 1
+  cliantNumber: 0
+  maxCliant: 4
   pairNum: 5
   cardRotaSpeed: 3
   cardMask: {fileID: 1593254657}

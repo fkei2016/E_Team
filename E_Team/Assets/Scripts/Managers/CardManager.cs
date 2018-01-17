@@ -8,6 +8,10 @@ using UnityEngine.UI;
 
 public class CardManager : SingletonMonoBehaviour<CardManager> {
 
+    public int cliantNumber = 0;
+    [SerializeField]
+    private int maxCliant = 4;
+
     [SerializeField, Range(2, 6)]
     private int pairNum = 3;
     [SerializeField]
@@ -100,7 +104,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         //        card.OnClick(Input.mousePosition);
         //    }
         //}
-
+        
         // アクティブユーザーのクリック処理
         if (battle.activeUser.click)
         {
@@ -108,6 +112,15 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             {
                 card.OnClick(battle.activeUser.clickPosition);
             }
+        }
+
+        if(turnFinish)
+        {
+            // 敵の攻撃でプレイヤーにダメージを与える
+            battle.TakeDamageToPlayer(100F);
+
+            // ターンの切り替え
+            battle.TurnChange();
         }
 
         // ターン交代のタイミング
@@ -128,12 +141,6 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 // スキル上昇
                 battle.SkillUp(1F);
             }
-
-            // 敵の攻撃でプレイヤーにダメージを与える
-            battle.TakeDamageToPlayer(100F);
-
-            // ターンの切り替え
-            battle.TurnChange();
         }
 
         foreach(var card in useCards)
@@ -226,6 +233,15 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
         // カードの再生成
         useCards = MakeCards(pairNum * 2);
+        // [Master]ペアリストの生成
+        var list = generator.MakePairList(13, useCards.Length);
+        var array = new List<int>();
+        for(int i = 0; i < useCards.Length; i++)
+        {
+            array.Add(generator.GetNonOverlappingValue(list));
+        }
+        // カードに番号を割り振る
+        generator.AppendPairList(useCards, array.ToArray());
         remainingCards = useCards.Length;
 
         // カード配置の生成と調整

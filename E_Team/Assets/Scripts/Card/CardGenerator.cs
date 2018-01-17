@@ -24,17 +24,32 @@ public class CardGenerator : MonoBehaviour {
     /// 複数のカード
     /// </returns>
     public Card[] CreateCards(int cardNum) {
-        // ペアリストの作成
-        var pairList = MakePairNumbers(designs.Length, cardNum);
-
         // カードを複数枚の作成
         var cards = new Card[cardNum];
         for(int i = 0; i < cards.Length; i++)
         {
-            var num = GetNonOverlappingValue(pairList);
-            cards[i] = CreateCard(num);
+            cards[i] = CreateCard();
         }
         return cards;
+    }
+
+    /// <summary>
+    /// カードにペア番号を割り振る
+    /// </summary>
+    /// <param name="cards">
+    /// カード配列
+    /// </param>
+    /// <param name="pairList">
+    /// ペアリスト
+    /// </param>
+    public void AppendPairList(Card[] cards, int[] pairList) {
+        for(int i = 0; i < cards.Length; i++)
+        {
+            var number = pairList[i];
+            var design = cards[i].transform.GetChild(1).gameObject;
+            Generator.AttachImage(design, designs[number]);
+            cards[i].number = number;
+        }
     }
 
     /// <summary>
@@ -46,7 +61,7 @@ public class CardGenerator : MonoBehaviour {
     /// <returns>
     /// 単体のカード
     /// </returns>
-    private Card CreateCard(int number) {
+    private Card CreateCard(int number = -1) {
         // 親オブジェクトの作成
         var obj = Generator.Create("Card", transform);
 
@@ -54,7 +69,9 @@ public class CardGenerator : MonoBehaviour {
         Generator.Create("Frame", obj.transform, frameTex);
 
         // 「柄」の追加
-        Generator.Create("Design", obj.transform, designs[number]).transform.rotation = Quaternion.Euler(Vector3.up * 180F);
+        var design = Generator.Create("Design", obj.transform);
+        design.transform.rotation = Quaternion.Euler(Vector3.up * 180F);
+        if(number != -1) Generator.AttachImage(design, designs[number]);
 
         // 「背面」の追加
         Generator.Create("Back", obj.transform, backTex);
@@ -63,39 +80,40 @@ public class CardGenerator : MonoBehaviour {
         var card = obj.AddComponent<Card>();
         card.number = number + 1;
         card.size = new Vector2(backTex.width, backTex.height);
-        obj.GetComponent<RectTransform>().sizeDelta = card.size;
+        var cardRect = obj.GetComponent<RectTransform>();
+        cardRect.sizeDelta = card.size;
         return card;
     }
 
     /// <summary>
     /// ペアリストの作成
     /// </summary>
-    /// <param name="numLength">
-    /// 数列の長さ
+    /// <param name="maxValue">
+    /// リストの最大値
     /// </param>
-    /// <param name="cardMaxSize">
-    /// カードの最大数
+    /// <param name="maxSize">
+    /// リストの最大数
     /// </param>
     /// <returns>
     /// ペアリスト
     /// </returns>
-    private List<int> MakePairNumbers(int numLength, int cardMaxSize) {
+    public List<int> MakePairList(int maxValue, int maxSize) {
         // 「柄の数」分の数列を作成
-        var rangeList = new List<int>();
-        for (int i = 0; i < numLength; i++)
+        var range = new List<int>();
+        for (int i = 0; i < maxValue; i++)
         {
-            rangeList.Add(i);
+            range.Add(i);
         }
 
         // 数列からペアになる番号の抽選
-        var pairNumbers = new List<int>();
-        for (var i = 0; i < cardMaxSize / 2; i++)
+        var pairList = new List<int>();
+        for (var i = 0; i < maxSize / 2; i++)
         {
-            var num = GetNonOverlappingValue(rangeList);
-            pairNumbers.Add(num);
-            pairNumbers.Add(num);
+            var value = GetNonOverlappingValue(range);
+            pairList.Add(value);
+            pairList.Add(value);
         }
-        return pairNumbers;
+        return pairList;
     }
 
 
@@ -108,12 +126,10 @@ public class CardGenerator : MonoBehaviour {
     /// <returns>
     /// 重複しない値
     /// </returns>
-    private int GetNonOverlappingValue(List<int> list) {
-        // ランダムに要素番号を選ぶ
-        var element = Random.Range(0, list.Count);
-        // リストから値を取り除く
-        element = list[element];
-        list.Remove(element);
-        return element;
+    public int GetNonOverlappingValue(List<int> list) {
+        var value = Random.Range(0, list.Count);
+        value = list[value];
+        list.Remove(value);
+        return value;
     }
 }
