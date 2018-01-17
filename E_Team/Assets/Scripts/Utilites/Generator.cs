@@ -45,9 +45,9 @@ public class Generator : MonoBehaviour {
     /// <returns>
     /// 生成済みオブジェクト
     /// </returns>
-    static public GameObject Create(string name, Transform parent, Texture2D tex) {
+    static public GameObject Create(string name, Transform parent, Texture2D tex = null) {
         var obj = Create(name, parent);
-        AttachImage(obj, tex);
+        if(tex) AttachImage(obj, tex);
         return obj;
     }
 

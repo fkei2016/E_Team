@@ -9,6 +9,8 @@ public class CardSpacement : MonoBehaviour {
 
     [SerializeField]
     private Texture2D baseTex;
+    [SerializeField]
+    private RectOffset offset;
 
     private Rect rect;
     private GridLayoutGroup layout;
@@ -54,9 +56,9 @@ public class CardSpacement : MonoBehaviour {
 
         // レイアウトのサイズや位置の修正
         var margin = rect.size - new Vector2(cardSize.x * row, cardSize.y * col);
-        layout.padding.left = (int)margin.x / 4;
-        layout.padding.top = (int)margin.y / 4;
-        layout.spacing = new Vector2(0F, layout.padding.top);
+        layout.padding.left = offset.left + (int)margin.x / 4;
+        layout.padding.top = offset.top + (int)margin.y / 4;
+        layout.spacing = new Vector2(0F, layout.padding.top / 4F);
     }
 
     /// <summary>

@@ -16,26 +16,31 @@ public class Card : MonoBehaviour {
     public Vector2 size = Vector2.one;
 
     private GameObject back;
-    private bool rotateFlag;
     private float toRotation;
+    private bool rotateFlag;
+    private bool isPlayFade;
 
     private Animation anim;
 
+    public bool active
+    {
+        get { return back.activeSelf; }
+    }
+
+    public bool isFinish
+    {
+        get { return isPlayFade && !anim.IsPlaying("FadeOut"); }
+    }
+    
     /// <summary>
     /// 開始時に実行
     /// </summary>
     private void Start() {
         // 背面の取得
         back = transform.GetChild(transform.childCount - 1).gameObject;
-        rotateFlag = false;
         toRotation = 0F;
-
-        // "EventTrigger"に"PointerDown"の処理を追加する
-        gameObject.AddEventTrigger(EventTriggerType.PointerDown,
-            data => {
-                if (back.activeSelf && !rotateFlag)
-                    Open();
-            });
+        rotateFlag = false;
+        isPlayFade = false;
 
         // フェードアウトのアニメーションを追加
         anim = gameObject.AddAnimationClip(new string[] { "FadeOut" });
@@ -46,7 +51,7 @@ public class Card : MonoBehaviour {
     /// </summary>
     private void Update() {
         // 回転処理をかける
-        if(rotateFlag)
+        if (rotateFlag)
         {
             transform.Rotate(Vector3.up * rotaSpd);
             if (transform.localEulerAngles.y >= toRotation - rotaSpd)
@@ -92,5 +97,18 @@ public class Card : MonoBehaviour {
     public IEnumerator FadeOut(float waitTime = 0F) {
         yield return new WaitForSeconds(waitTime);
         anim.Play("FadeOut");
+        isPlayFade = true;
+    }
+
+    public void OnClick(Vector3 position) {
+        var worldPosition = Camera.main.WorldToScreenPoint(transform.position);
+
+        // カードの矩形とクリック座標の交点で判定
+        Rect rect = new Rect(worldPosition.x - size.x / 2, worldPosition.y - size.y / 2, size.x, size.y);
+        if (rect.Contains(position))
+        {
+            if (back.activeSelf && !rotateFlag)
+                Open();
+        }
     }
 }
