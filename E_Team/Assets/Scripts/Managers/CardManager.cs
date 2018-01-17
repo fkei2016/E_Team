@@ -8,16 +8,16 @@ using UnityEngine.UI;
 
 public class CardManager : SingletonMonoBehaviour<CardManager> {
 
+    public int cliantNumber = 0;
+    [SerializeField]
+    private int maxCliant = 4;
+
     [SerializeField, Range(2, 6)]
     private int pairNum = 3;
     [SerializeField]
     private float cardRotaSpeed = 1F;
-
-    [Header("Enemy")]
     [SerializeField]
-    private UnityEngine.UI.Text atkCount;
-    [SerializeField]
-    private TestAnimation anim;
+    private Image cardMask;
 
     private bool turnFinish;
     private int keepPairNum;
@@ -27,20 +27,12 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private CardGenerator generator;
     private CardSpacement spacement;
     private Vector3[] cardPositions;
-
-    private Slider[] sliders;
-
-    private List<int> usenums;
-    private ExitGames.Client.Photon.Hashtable table;
-    private PhotonView view;
+    private BattleManager battle;
 
     /// <summary>
     /// 開始時に処理
     /// </summary>
     private void Start() {
-
-        view=GetComponent<PhotonView>();
-
         // ペアを組むスタック
         pairCard = new Stack<Card>();
 
@@ -48,28 +40,21 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         generator = FindObjectOfType<CardGenerator>();
         spacement = FindObjectOfType<CardSpacement>();
 
-        table = new ExitGames.Client.Photon.Hashtable();
-
-        usenums = new List<int>();
-
-        table.Add("usenum", usenums);
-
         // カードの生成
-        if (PhotonNetwork.isMasterClient)
         RemakeCards(false);
 
-        sliders = FindObjectsOfType<Slider>();
+        // バトルの管理者と連携
+        battle = BattleManager.instance;
     }
 
     /// <summary>
     /// 更新時に処理
     /// </summary>
     private void Update() {
-
-        if (useCards == null)//カードが配布されるまで待機
+        // [Debug]ブレイクポイント
+        if(Input.GetKeyDown(KeyCode.Space))
         {
-            ProviteUseCard();
-            return;
+            Debug.Break();
         }
 
         // ペア数が変わったときに生成
@@ -90,7 +75,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         }
 
         // カード移動時のタッチ無効処理
-        if (useCards[0].transform.position == cardPositions[0])
+        if(useCards[0].transform.position == cardPositions[0])
         {
             if (!useCards[0].enabled)
             {
@@ -107,7 +92,35 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             useCards[i].rotaSpd = cardRotaSpeed;
 
             // カード配置までの線形補間
-            useCards[i].transform.position = Vector2.MoveTowards(useCards[i].transform.position, cardPositions[i], Time.deltaTime * 500F);
+            useCards[i].transform.position = Vector3.MoveTowards(useCards[i].transform.position, cardPositions[i], Time.deltaTime * 100F);
+        }
+
+        //// [Debug]シングルプレイテスト用
+        //if (Input.GetMouseButtonDown(0) && !cardMask.gameObject.activeSelf)
+        //{
+        //    foreach (var card in useCards)
+        //    {
+        //        if(card.gameObject.activeSelf)
+        //        card.OnClick(Input.mousePosition);
+        //    }
+        //}
+        
+        // アクティブユーザーのクリック処理
+        if (battle.activeUser.click)
+        {
+            foreach (var card in useCards)
+            {
+                card.OnClick(battle.activeUser.clickPosition);
+            }
+        }
+
+        if(turnFinish)
+        {
+            // 敵の攻撃でプレイヤーにダメージを与える
+            battle.TakeDamageToPlayer(100F);
+
+            // ターンの切り替え
+            battle.TurnChange();
         }
 
         // ターン交代のタイミング
@@ -120,38 +133,26 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 // カードのフェードアウト
                 var card = pairCard.Pop();
                 StartCoroutine(card.FadeOut(2F));
-                card.enabled = false;
-                remainingCards--;
+                --remainingCards;
 
-                // ペアの数だけダメージを与える
-                foreach (var slider in sliders)
-                {
-                    if(remainingCards % 2 == 0)
-                    {
-                        slider.value--;
-                    }
-                }
-                // 敵のダメージアニメーション
-                anim.PlayDamageAnimation();
+                //  ペアの数だけ敵にダメージを与える
+                if (remainingCards % 2 == 0)
+                    battle.TakeDamageToEnemy();
+                // スキル上昇
+                battle.SkillUp(1F);
             }
+        }
 
-            // 敵の攻撃カウンターとアニメーション
-            var count = int.Parse(atkCount.text);
-            if (count-- < 0)
-            {
-                count = 10;
-                anim.PlayAttackAnimation();
-            }
-            atkCount.text = (count).ToString();
+        foreach(var card in useCards)
+        {
+            if(!card.isFinish) return;
         }
 
         if (!turnFinish && remainingCards <= 0)
         {
             // カードの再生成
-            if(PhotonNetwork.isMasterClient)//自身がマスタークライアントの場合
             RemakeCards();
         }
-
     }
 
     /// <summary>
@@ -175,12 +176,20 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
             if (turnFinish)
             {
+                // ペア不成立のエフェクト
+                var missFX = GetComponent<MissEffect>();
+                StartCoroutine(missFX.Emission(card1.transform));
+                StartCoroutine(missFX.Emission(card2.transform));
                 // カードを閉じる
                 StartCoroutine(card1.Close(1.5F));
                 StartCoroutine(card2.Close(1.5F));
             }
             else
             {
+                // ペア成立のエフェクト
+                var comboFX = GetComponent<TouchCombo>();
+                StartCoroutine(comboFX.Emission(card1.transform));
+                StartCoroutine(comboFX.Emission(card2.transform));
                 // 成立したペアをスタック
                 pairCard.Push(card1);
                 pairCard.Push(card2);
@@ -224,47 +233,22 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
         // カードの再生成
         useCards = MakeCards(pairNum * 2);
+        // [Master]ペアリストの生成
+        var list = generator.MakePairList(generator.maxDesign, useCards.Length);
+        var array = new List<int>();
+        for(int i = 0; i < useCards.Length; i++)
+        {
+            array.Add(generator.GetNonOverlappingValue(list));
+        }
+        // カードに番号を割り振る
+        generator.AppendPairList(useCards, array.ToArray());
         remainingCards = useCards.Length;
 
         // カード配置の生成と調整
-
         spacement.AdjustmentLayout(useCards);
         cardPositions = spacement.MakePositions(useCards);
 
         // ターンを変更
         turnFinish = false;
     }
-
-
-    //マスタークライアントが生成したカードを要請して共有します
-    private void ProviteUseCard()
-    {
-
-
-
-        object value = null;
-
-        if(table.TryGetValue("usenum",out value))
-        {
-            usenums = (List<int>)value;
-        }
-
-        if (usenums.Count == 0)
-            return;
-
-        Debug.Log("ok");
-
-    }
-
-    //photonview必須？
-    [PunRPC]
-    private void getcard(string _txt)
-    {
-        
-        
-
-
-
-    }
-
 }

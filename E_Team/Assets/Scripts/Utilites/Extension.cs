@@ -20,11 +20,40 @@ public static class Extension {
     /// <param name="parent">
     /// 親トランスフォーム
     /// </param>
+    /// <param name="worldPositionStays">
+    /// ワールド座標にするか
+    /// </param>
     public static void Reset(this Transform trans, Transform parent = null, bool worldPositionStays = true) {
+        trans.Reset(Vector3.zero, Quaternion.identity, Vector3.one, parent, worldPositionStays);
+    }
+
+    /// <summary>
+    /// 座標系のリセット
+    /// </summary>
+    /// <param name="trans">
+    /// 拡張メゾット
+    /// </param>
+    /// <param name="position">
+    /// 初期の位置座標
+    /// </param>
+    /// <param name="rotation">
+    /// 初期の回転角度
+    /// </param>
+    /// <param name="scale">
+    /// 初期の拡大率
+    /// </param>
+    /// <param name="parent">
+    /// 親トランスフォーム
+    /// </param>
+    /// <param name="worldPositionStays">
+    /// ワールド座標にするか
+    /// </param>
+    public static void Reset(this Transform trans, Vector3 position, Quaternion rotation, Vector3 scale,
+        Transform parent = null, bool worldPositionStays = true) {
         trans.SetParent(parent, worldPositionStays);
-        trans.localPosition = Vector3.zero;
-        trans.rotation = Quaternion.identity;
-        trans.localScale = Vector3.one;
+        trans.localPosition = position;
+        trans.rotation = rotation;
+        trans.localScale = scale;
     }
 
     /// <summary>

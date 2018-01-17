@@ -3,42 +3,41 @@ using System.Collections;
 
 public class TouchCombo : MonoBehaviour
 {
-
-    /// <summary>
-    /// 出力先キャンバス
-    /// </summary>
-    public GameObject TargetCanvas;
-
     /// <summary>
     /// ポップアップするテキストオブジェクト
     /// NumberTextScript付き
     /// </summary>
     public GameObject PopupText;
 
+    /// <summary>
+    /// ポップアップする文字列
+    /// </summary>
+    public string PopupString = "Combo";
 
-    //コンボ数
-    public int ComboCount;
+    ////コンボ数
+    //public int ComboCount;
 
-    // Use this for initialization
-    void Start()
+    /// <summary>
+    /// パーティクルの発生
+    /// </summary>
+    /// <param name="target">
+    /// 表示するトランスフォーム
+    /// </param>
+    /// <returns></returns>
+    public IEnumerator Emission(Transform target)
     {
+        yield return new WaitForSeconds(1F);
 
-    }
+        var temp = new GameObject("Combo");
+        temp.transform.Reset(transform);
+        //temp.transform.position = Vector3.zero;
 
-    // Update is called once per frame
-    void Update()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            var temp = new GameObject();
-            temp.transform.position = Vector3.zero;
-            ComboPopUp gen = temp.AddComponent<ComboPopUp>();
-            gen.PopupString = ComboCount.ToString() + "combo";
-            gen.PopupPosition = Input.mousePosition; 
-            gen.PopupTextWidth = 30.0f;
-            gen.TargetCanvas = this.TargetCanvas;
-            gen.PopupTextObject = this.PopupText;
-            gen.Popup();
-        }
+        var gen = temp.AddComponent<ComboPopUp>();
+        gen.PopupString = PopupString;
+        //gen.PopupPosition = worldPosition;
+        //gen.PopupTextWidth = 30.0f;
+        gen.TargetCanvas = target.gameObject;
+        gen.PopupTextObject = this.PopupText;
+        gen.Popup();
     }
 }
