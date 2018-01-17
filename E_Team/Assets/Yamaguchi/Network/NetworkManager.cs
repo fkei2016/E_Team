@@ -21,8 +21,6 @@ public class NetworkManager : SingletonMonoBehaviour<NetworkManager> {
     protected override void Awake()
     {
         base.Awake();
-        photonview = FindObjectOfType<PhotonView>();
-        DontDestroyOnLoad(photonview);
 
         PhotonNetwork.ConnectUsingSettings("ver1.0");
     }
@@ -54,7 +52,6 @@ public class NetworkManager : SingletonMonoBehaviour<NetworkManager> {
         roomOptions.IsOpen = true;
 
         PhotonNetwork.CreateRoom("pRoom2", roomOptions, null);//ルームを生成し名前を指定
-
     }
 
     //ルームから退室したプレイヤーが直前で行う処理
@@ -77,15 +74,7 @@ public class NetworkManager : SingletonMonoBehaviour<NetworkManager> {
     [PunRPC]
     private void Networkorder()
     {
-        
         PhotonNetwork.LoadLevel("O_Test");
-    }
-
-    private void Update()
-    {
-
-        //Debug.Log(PhotonNetwork.playerList[0].name);
-
     }
 
 }

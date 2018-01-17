@@ -30,15 +30,17 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
     private Slider[] sliders;
 
-    
-    private int[] numlist;
-
-
+    private List<int> usenums;
+    private ExitGames.Client.Photon.Hashtable table;
+    private PhotonView view;
 
     /// <summary>
     /// 開始時に処理
     /// </summary>
     private void Start() {
+
+        view=GetComponent<PhotonView>();
+
         // ペアを組むスタック
         pairCard = new Stack<Card>();
 
@@ -46,27 +48,29 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         generator = FindObjectOfType<CardGenerator>();
         spacement = FindObjectOfType<CardSpacement>();
 
+        table = new ExitGames.Client.Photon.Hashtable();
+
+        usenums = new List<int>();
+
+        table.Add("usenum", usenums);
+
         // カードの生成
+        if (PhotonNetwork.isMasterClient)
         RemakeCards(false);
 
         sliders = FindObjectsOfType<Slider>();
-
-        //---
-
-        if (PhotonNetwork.isMasterClient)
-        {
-            var prop = new ExitGames.Client.Photon.Hashtable();
-            prop.Add("usecards",numlist);
-            PhotonNetwork.room.SetCustomProperties(prop);
-        }
-        
-        //---
     }
 
     /// <summary>
     /// 更新時に処理
     /// </summary>
     private void Update() {
+
+        if (useCards == null)//カードが配布されるまで待機
+        {
+            ProviteUseCard();
+            return;
+        }
 
         // ペア数が変わったときに生成
         if (keepPairNum != pairNum)
@@ -144,6 +148,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         if (!turnFinish && remainingCards <= 0)
         {
             // カードの再生成
+            if(PhotonNetwork.isMasterClient)//自身がマスタークライアントの場合
             RemakeCards();
         }
 
@@ -222,6 +227,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         remainingCards = useCards.Length;
 
         // カード配置の生成と調整
+
         spacement.AdjustmentLayout(useCards);
         cardPositions = spacement.MakePositions(useCards);
 
@@ -229,12 +235,36 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         turnFinish = false;
     }
 
-    [PunRPC]
-    private void MakeCards(ExitGames.Client.Photon.Hashtable _prop)
+
+    //マスタークライアントが生成したカードを要請して共有します
+    private void ProviteUseCard()
     {
+
+
+
         object value = null;
+
+        if(table.TryGetValue("usenum",out value))
+        {
+            usenums = (List<int>)value;
+        }
+
+        if (usenums.Count == 0)
+            return;
+
+        Debug.Log("ok");
+
+    }
+
+    //photonview必須？
+    [PunRPC]
+    private void getcard(string _txt)
+    {
+        
+        
+
+
 
     }
 
 }
-
