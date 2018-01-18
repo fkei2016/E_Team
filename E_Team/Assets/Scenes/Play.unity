@@ -3243,6 +3243,11 @@ MonoBehaviour:
   pairNum: 5
   cardRotaSpeed: 3
   cardMask: {fileID: 1593254657}
+  attackEffeckPrefab: {fileID: 1539772204733720, guid: f452fb130af54024b8788e55e25d8c09,
+    type: 2}
+  enemy: {fileID: 1255921962}
+  attackParticles: []
+  effectPearent: {fileID: 2018643552}
 --- !u!114 &1707120615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3643,6 +3648,34 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 5
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2018643552
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 2018643553}
+  m_Layer: 0
+  m_Name: Effeck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2018643553
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2018643552}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2026502412
 GameObject:

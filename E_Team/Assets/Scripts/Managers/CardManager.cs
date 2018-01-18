@@ -29,6 +29,18 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private Vector3[] cardPositions;
     private BattleManager battle;
 
+
+    //藤井追加分
+    [SerializeField]
+    private GameObject attackEffeckPrefab;
+    [SerializeField]
+    private GameObject enemy;
+    [SerializeField]
+    private List<AttackParticle> attackParticles;
+    [SerializeField]
+    private GameObject effectPearent;
+
+
     /// <summary>
     /// 開始時に処理
     /// </summary>
@@ -141,6 +153,10 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
             // ターンの切り替え
             battle.TurnChange();
+            foreach (var effect in attackParticles)
+            {
+                effect.attackFlag = true;
+            }
             Debug.Log("Next");
         }
 
@@ -155,6 +171,11 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         {
             RemakeCards();
             battle.TurnChange();
+            foreach (var effect in attackParticles)
+            {
+                effect.attackFlag = true;
+            }
+
         }
     }
 
@@ -196,6 +217,22 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 // 成立したペアをスタック
                 pairCard.Push(card1);
                 pairCard.Push(card2);
+                //成立したペアにエフェクトの追加　（藤井追加）
+                var effect1 = Instantiate(attackEffeckPrefab, effectPearent.transform);
+                effect1.GetComponent<AttackParticle>().TargetSize = card1.size;
+                effect1.transform.position = Camera.main.ScreenToWorldPoint(card1.transform.position);
+                effect1.transform.position = Vector3.forward * 83.0f;
+                effect1.GetComponent<AttackParticle>().fourCornerTarget = card1.gameObject;
+                effect1.GetComponent<AttackParticle>().target = enemy;
+                var effect2 = Instantiate(attackEffeckPrefab, effectPearent.transform);
+                effect2.GetComponent<AttackParticle>().TargetSize = card2.size;
+                effect2.transform.position = Camera.main.ScreenToWorldPoint(card2.transform.position);
+                effect2.transform.position = Vector3.forward * 83.0f;
+                effect2.GetComponent<AttackParticle>().fourCornerTarget = card2.gameObject;
+                effect2.GetComponent<AttackParticle>().target = enemy;
+                //作成したエフェクトをリストに追加
+                attackParticles.Add(effect1.GetComponent<AttackParticle>());
+                attackParticles.Add(effect2.GetComponent<AttackParticle>());
             }
         }
     }
