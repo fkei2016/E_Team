@@ -29,6 +29,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private Vector3[] cardPositions;
     private BattleManager battle;
 
+    [Header("AttakParticle")]
 
     //藤井追加分
     [SerializeField]
@@ -152,12 +153,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             battle.TakeDamageToPlayer(100F);
 
             // ターンの切り替え
-            battle.TurnChange();
-            foreach (var effect in attackParticles)
-            {
-                effect.attackFlag = true;
-            }
-            Debug.Log("Next");
+            TurnChange();
         }
 
         // 全消しの検知
@@ -170,12 +166,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         if (!turnFinish && remainingCards <= 0)
         {
             RemakeCards();
-            battle.TurnChange();
-            foreach (var effect in attackParticles)
-            {
-                effect.attackFlag = true;
-            }
-
+            TurnChange();
         }
     }
 
@@ -210,29 +201,12 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             }
             else
             {
-                // ペア成立のエフェクト
-                var comboFX = GetComponent<TouchCombo>();
-                StartCoroutine(comboFX.Emission(card1.transform));
-                StartCoroutine(comboFX.Emission(card2.transform));
-                // 成立したペアをスタック
-                pairCard.Push(card1);
-                pairCard.Push(card2);
-                //成立したペアにエフェクトの追加　（藤井追加）
-                var effect1 = Instantiate(attackEffeckPrefab, effectPearent.transform);
-                effect1.GetComponent<AttackParticle>().TargetSize = card1.size;
-                effect1.transform.position = Camera.main.ScreenToWorldPoint(card1.transform.position);
-                effect1.transform.position = Vector3.forward * 83.0f;
-                effect1.GetComponent<AttackParticle>().fourCornerTarget = card1.gameObject;
-                effect1.GetComponent<AttackParticle>().target = enemy;
-                var effect2 = Instantiate(attackEffeckPrefab, effectPearent.transform);
-                effect2.GetComponent<AttackParticle>().TargetSize = card2.size;
-                effect2.transform.position = Camera.main.ScreenToWorldPoint(card2.transform.position);
-                effect2.transform.position = Vector3.forward * 83.0f;
-                effect2.GetComponent<AttackParticle>().fourCornerTarget = card2.gameObject;
-                effect2.GetComponent<AttackParticle>().target = enemy;
-                //作成したエフェクトをリストに追加
-                attackParticles.Add(effect1.GetComponent<AttackParticle>());
-                attackParticles.Add(effect2.GetComponent<AttackParticle>());
+                // ペアパーティクルの発生
+                PairParticle(card1, GetComponent<TouchCombo>());
+                PairParticle(card2, GetComponent<TouchCombo>());
+                // ペアカードを積む
+                pairCard.Push(card);
+                pairCard.Push(card);
             }
         }
     }
@@ -290,5 +264,35 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
         // ターンを変更
         turnFinish = false;
+    }
+
+    /// <summary>
+    /// ターン切り替え
+    /// </summary>
+    void TurnChange() {
+        battle.TurnChange();
+        foreach (var effect in attackParticles)
+        {
+            effect.Attack(true);
+        }
+    }
+
+    /// <summary>
+    /// ペアのパーティクル設定
+    /// </summary>
+    /// <param name="card">
+    /// 対象カード
+    /// </param>
+    /// <param name="combo">
+    /// コンボパーティクル
+    /// </param>
+    void PairParticle(Card card, TouchCombo combo) {
+        // コンボ発生
+        StartCoroutine(combo.Emission(card.transform));
+        // 攻撃エフェクト発生
+        var fx = Instantiate(attackEffeckPrefab, effectPearent.transform);
+        var attack = fx.GetComponent<AttackParticle>();
+        attack.Emission(card.transform.position, 83F, card.size, card.gameObject, enemy);
+        attackParticles.Add(attack);
     }
 }

@@ -218,14 +218,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 114308fe5cfb76f43b668f4aac006012, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fourCornerTarget: {fileID: 0}
-  patrol: 0
-  target: {fileID: 0}
-  attackFlag: 0
   easetype: 21
   wildfire: {fileID: 198978705039372656}
   explosion: {fileID: 198374798107535744}
-  particleSize: 1000
+  particleSize: 15
 --- !u!114 &114839758550726660
 MonoBehaviour:
   m_ObjectHideFlags: 1
