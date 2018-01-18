@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour {
 
+    public int number;
+
     private Image skill;
     private GameObject basic;
 
@@ -19,18 +21,6 @@ public class Player : MonoBehaviour {
     {
         get { return basic.activeSelf; }
         set { basic.SetActive(value); }
-    }
-
-    public int number;
-
-    public bool click
-    {
-        get { return Input.GetMouseButtonDown(0); }
-    }
-
-    public Vector3 clickPosition
-    {
-        get { return Input.mousePosition; }
     }
 
     /// <summary>

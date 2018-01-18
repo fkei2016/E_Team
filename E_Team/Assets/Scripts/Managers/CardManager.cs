@@ -104,54 +104,57 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         //        card.OnClick(Input.mousePosition);
         //    }
         //}
-        
+
         // アクティブユーザーのクリック処理
-        if (battle.activeUser.click)
+        if (Cliant.click)
         {
             foreach (var card in useCards)
             {
-                card.OnClick(battle.activeUser.clickPosition);
+                card.OnClick(Cliant.clickPosition);
             }
         }
 
-        if(turnFinish)
-        {
-            // 敵の攻撃でプレイヤーにダメージを与える
-            battle.TakeDamageToPlayer(100F);
-
-            // ターンの切り替え
-            battle.TurnChange();
-        }
-
-        // ターン交代のタイミング
+        // ペア成立の処理
         if (turnFinish || pairCard.Count >= remainingCards)
         {
-            // 成立したペアを消す
-            turnFinish = false;
             while (pairCard.Count > 0)
             {
                 // カードのフェードアウト
                 var card = pairCard.Pop();
                 StartCoroutine(card.FadeOut(2F));
-                --remainingCards;
 
                 //  ペアの数だけ敵にダメージを与える
-                if (remainingCards % 2 == 0)
-                    battle.TakeDamageToEnemy();
+                if (--remainingCards % 2 == 0)
+                    battle.TakeDamageToEnemy(50F);
                 // スキル上昇
                 battle.SkillUp(1F);
             }
         }
 
-        foreach(var card in useCards)
+        // ターン終了時の攻撃
+        if (turnFinish)
+        {
+            turnFinish = false;
+
+            // 敵の攻撃でプレイヤーにダメージを与える
+            battle.TakeDamageToPlayer(100F);
+
+            // ターンの切り替え
+            battle.TurnChange();
+            Debug.Log("Next");
+        }
+
+        // 全消しの検知
+        foreach (var card in useCards)
         {
             if(!card.isFinish) return;
         }
 
+        // 再配布とターン切り替え
         if (!turnFinish && remainingCards <= 0)
         {
-            // カードの再生成
             RemakeCards();
+            battle.TurnChange();
         }
     }
 

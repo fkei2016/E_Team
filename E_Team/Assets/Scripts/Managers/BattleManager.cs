@@ -83,8 +83,8 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// 敵にダメージを与える
     /// </summary>
     /// <param name="damage"></param>
-    public void TakeDamageToEnemy() {
-        var takeDown = target[0].TakeDamage();
+    public void TakeDamageToEnemy(float damage) {
+        var takeDown = target[0].TakeDamage(damage);
         //target.gameObject.SetActive(takeDown);
         target[0].PlayDamageAnimation();
     }

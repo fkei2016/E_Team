@@ -18,7 +18,7 @@ public class TouchParticle : MonoBehaviour {
     /// </summary>
     void Start() {
         // パーティクルを生成
-        var particle = (GameObject)Instantiate(CLICK_PARTICLE);
+        var particle = Instantiate(CLICK_PARTICLE, transform);
 
         // パーティクルの再生停止を制御するためにコンポーネントを取得
         m_ClickParticleSystem = particle.GetComponent<ParticleSystem>();
@@ -33,9 +33,9 @@ public class TouchParticle : MonoBehaviour {
     /// </summary>
     void Update() {
         // クリック処理
-        if (Input.GetMouseButtonDown(0))
+        if (Cliant.click)
         {
-            Emission(Input.mousePosition);
+            Emission(Cliant.clickPosition);
         }
     }
 

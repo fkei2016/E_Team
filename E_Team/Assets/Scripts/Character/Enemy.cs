@@ -48,8 +48,9 @@ public class Enemy : MonoBehaviour {
     /// <returns>
     /// 耐久値が０未満
     /// </returns>
-    public bool TakeDamage() {
-        return (hp.value-- > 0);
+    public bool TakeDamage(float damage){
+        hp.value -= damage;
+        return (hp.value > 0);
     }
 
     /// <summary>
