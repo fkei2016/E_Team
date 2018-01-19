@@ -205,8 +205,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 PairParticle(card1, GetComponent<TouchCombo>());
                 PairParticle(card2, GetComponent<TouchCombo>());
                 // ペアカードを積む
-                pairCard.Push(card);
-                pairCard.Push(card);
+                pairCard.Push(card1);
+                pairCard.Push(card2);
             }
         }
     }
