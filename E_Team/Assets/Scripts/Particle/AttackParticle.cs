@@ -58,12 +58,6 @@ public class AttackParticle : MonoBehaviour {
     /// <summary>
     /// パーティクルの発生
     /// </summary>
-    /// <param name="screenPosition">
-    /// スクリーン座標
-    /// </param>
-    /// <param name="depth">
-    /// ワールド座標の深度
-    /// </param>
     /// <param name="size">
     /// 矩形のサイズ
     /// </param>
@@ -76,10 +70,10 @@ public class AttackParticle : MonoBehaviour {
     /// <returns>
     /// リストへ追加される
     /// </returns>
-    public AttackParticle Emission(Vector3 screenPosition, float depth, Vector2 size, GameObject shooter, GameObject target) {
-        // ワールド座標（深度付き）への変換
-        transform.position = Camera.main.ScreenToWorldPoint(screenPosition);
-        transform.position = Vector3.forward * depth;
+    public AttackParticle Emission(Vector2 size, GameObject shooter, GameObject target) {
+        //// ワールド座標（深度付き）への変換
+        //transform.position = Camera.main.ScreenToWorldPoint(screenPosition);
+        //transform.position = Vector3.forward * 80F;
         // 初期値の設定
         this.rectSize = size;
         this.shooter = shooter;
@@ -94,9 +88,8 @@ public class AttackParticle : MonoBehaviour {
         if (!moveFlag)
         {
             moveFlag = true;
-            var targetSpriteSize = (rectSize / 2) / 10F;
-            var v2 = new Vector2(shooter.transform.position.x - targetSpriteSize.x * fourCorners[patrol].x,
-                shooter.transform.position.y + targetSpriteSize.y * fourCorners[patrol].y);
+            var v2 = new Vector2(shooter.transform.position.x - rectSize.x * fourCorners[patrol].x,
+                shooter.transform.position.y + rectSize.y * fourCorners[patrol].y);
             SetHash(v2, "ChangePatrol");
         }
     }

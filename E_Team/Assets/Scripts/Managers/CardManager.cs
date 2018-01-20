@@ -292,7 +292,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // 攻撃エフェクト発生
         var fx = Instantiate(attackEffeckPrefab, effectPearent.transform);
         var attack = fx.GetComponent<AttackParticle>();
-        attack.Emission(card.transform.position, 83F, card.size, card.gameObject, enemy);
+        attack.Emission(card.size / Camera.main.farClipPlane, card.gameObject, enemy);
         attackParticles.Add(attack);
     }
 }
