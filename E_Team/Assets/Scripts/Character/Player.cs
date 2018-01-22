@@ -5,10 +5,11 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour {
 
+    [HideInInspector]
     public int number;
 
     private Image skill;
-    private GameObject basic;
+    private GameObject mask;
 
     private float skillTmp;
 
@@ -19,16 +20,16 @@ public class Player : MonoBehaviour {
     }
     public bool active
     {
-        get { return basic.activeSelf; }
-        set { basic.SetActive(value); }
+        get { return mask.activeSelf; }
+        set { mask.SetActive(value); }
     }
 
     /// <summary>
     /// 開始時に実行
     /// </summary>
 	void Start () {
-        skill = transform.GetChild(0).GetComponent<Image>();
-        basic = transform.GetChild(2).gameObject;
+        skill = transform.GetChild(1).GetComponent<Image>();
+        mask = transform.GetChild(3).gameObject;
 
         // クリックでスキル発動処理の実行
         gameObject.AddEventTrigger(UnityEngine.EventSystems.EventTriggerType.PointerUp,

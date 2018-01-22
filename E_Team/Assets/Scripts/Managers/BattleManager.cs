@@ -23,7 +23,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         {
             foreach(var user in users)
             {
-                if(user.active)
+                if(!user.active)
                 {
                     return user;
                 }
@@ -39,6 +39,14 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         tmpHP = hp.value;
         damageSPD = 2.5F;
         turnNumber = 0;
+
+
+        // 指定の番号のみアクティブにする
+        foreach (var user in users)
+        {
+            user.active = true;
+        }
+        users[turnNumber].active = false;
     }
 
     /// <summary>
@@ -74,9 +82,9 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         // 指定の番号のみアクティブにする
         foreach(var user in users)
         {
-            user.active = false;
+            user.active = true;
         }
-        users[turnNumber].active = true;
+        users[turnNumber].active = false;
     }
 
     /// <summary>
