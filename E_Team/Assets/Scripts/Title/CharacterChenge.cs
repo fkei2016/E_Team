@@ -13,14 +13,11 @@ public class CharacterChenge : MonoBehaviour {
     private int characterNum = 1;
 
     [SerializeField]
-    private float time = 1.0f;
-
-    [SerializeField]
     private bool moveFlag = false;
 
-    [SerializeField]
-    private float deltime = 0.0f;
+    private float time = 1.0f;
 
+    private float delTime = 0.0f;
 
 	// Use this for initialization
 	void Start () {
@@ -34,13 +31,15 @@ public class CharacterChenge : MonoBehaviour {
 
         if (moveFlag)
         {
-            deltime += Time.deltaTime;
-            if (deltime > 1)
+            delTime += Time.deltaTime;
+            if (delTime > 1.0f)
             {
-                deltime = 0.0f;
                 moveFlag = false;
+                delTime = 0.0f;
             }
         }
+
+
 
     }
 
@@ -60,132 +59,38 @@ public class CharacterChenge : MonoBehaviour {
 
         if (characterNum == characters.Length)
         {
-            characterNum = 0;
+            characterNum = characters.Length - 1;
+            return;
         }
         if (characterNum == -1)
         {
-            characterNum = 3;
+            characterNum = 0;
+            return;
         }
 
+        for (int i = 0; i < characters.Length; i++)
+        {
+            if (num == 1)
+            {
+                Move(-1.58f, characters[i]);
+            }
+            else
+            {
+                Move(1.58f, characters[i]);
+            }
+        }
+    }
 
-        if (characterNum == 0)
-        {
-            if (num < 0)
-            {
-                Hashtable table = new Hashtable();
-                table.Add("x", 0);
-                table.Add("time", time);
-                iTween.MoveTo(characters[characterNum], table);
-                //table.Clear();
-                //table.Add("x", -200);
-                //table.Add("time", time);
-                //iTween.MoveTo(characters[characterNum + characters.Length - 1], table);
-                Vector3 pos = characters[characterNum + characters.Length - 1].transform.position;
-                pos.x = -200;
-                characters[characterNum + characters.Length - 1].transform.position = pos;
-                table.Clear();
-                table.Add("x", 200);
-                table.Add("time", time);
-                iTween.MoveTo(characters[characterNum + 1], table);
-            }
-            else
-            {
-                Hashtable table = new Hashtable();
-                table.Add("x", 0);
-                table.Add("time", time);
-                iTween.MoveTo(characters[characterNum], table);
-                table.Clear();
-                table.Add("x", -200);
-                table.Add("time", time);
-                iTween.MoveTo(characters[characterNum + characters.Length - 1], table);
-                //table.Clear();
-                //table.Add("x", 200);
-                //table.Add("time", time);
-                //iTween.MoveTo(characters[characterNum + 1], table);
-                Vector3 pos = characters[characterNum + 1].transform.position;
-                pos.x = 200;
-                characters[characterNum + 1].transform.position = pos;
-            }
-           
-        }
-        else if (characterNum == 3)
-        {
-            if (num < 0)
-            {
-                Hashtable table = new Hashtable();
-                table.Add("x", 0);
-                table.Add("time", time);
-                iTween.MoveTo(characters[characterNum], table);
-                //table.Clear();
-                //table.Add("x", -200);
-                //table.Add("time", time);
-                //iTween.MoveTo(characters[characterNum - 1], table);
-                Vector3 pos = characters[characterNum - 1].transform.position;
-                pos.x = -200;
-                characters[characterNum - 1].transform.position = pos;
-                table.Clear();
-                table.Add("x", 200);
-                table.Add("time", time);
-                iTween.MoveTo(characters[characterNum - characters.Length + 1], table);
-            }
-            else
-            {
-                Hashtable table = new Hashtable();
-                table.Add("x", 0);
-                table.Add("time", time);
-                iTween.MoveTo(characters[characterNum], table);
-                table.Clear();
-                table.Add("x", -200);
-                table.Add("time", time);
-                iTween.MoveTo(characters[characterNum - 1], table);
-                //table.Clear();
-                //table.Add("x", 200);
-                //table.Add("time", time);
-                //iTween.MoveTo(characters[characterNum - characters.Length + 1], table);
-                Vector3 pos = characters[characterNum - characters.Length + 1].transform.position;
-                pos.x = 200;
-                characters[characterNum - characters.Length + 1].transform.position = pos;
-            }
-        }
-        else
-        {
-            if (num < 0)
-            {
-                Hashtable table = new Hashtable();
-                
-                table.Add("x", 0);
-                table.Add("time", time);
-                iTween.MoveTo(characters[characterNum], table);
-                //table.Clear();
-                //table.Add("x", -200);
-                //table.Add("time", time);
-                //iTween.MoveTo(characters[characterNum - 1], table);
-                Vector3 pos = characters[characterNum - 1].transform.position;
-                pos.x = -200;
-                characters[characterNum - 1].transform.position = pos;
-                table.Clear();
-                table.Add("x", 200);
-                table.Add("time", time);
-                iTween.MoveTo(characters[characterNum + 1], table);
-            }
-            else
-            {
-                Hashtable table = new Hashtable();
-                table.Add("x", 0);
-                table.Add("time", time);
-                iTween.MoveTo(characters[characterNum], table);
-                table.Clear();
-                table.Add("x", -200);
-                table.Add("time", time);
-                iTween.MoveTo(characters[characterNum - 1], table);
-                //table.Clear();
-                //table.Add("x", 200);
-                //table.Add("time", time);
-                //iTween.MoveTo(characters[characterNum + 1], table);
-                Vector3 pos = characters[characterNum + 1].transform.position;
-                pos.x = 200;
-                characters[characterNum + 1].transform.position = pos;
-            }
-        }
+    void MoveEnd()
+    {
+        moveFlag = false;
+    }
+
+    void Move(float direction, GameObject obj)
+    {
+        Hashtable table = new Hashtable();
+        table.Add("x", direction);
+        table.Add("time", time);
+        iTween.MoveBy(obj, table);
     }
 }
