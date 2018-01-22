@@ -72,11 +72,11 @@ public class CharacterChenge : MonoBehaviour {
         {
             if (num == 1)
             {
-                Move(-40.0f, characters[i]);
+                Move(-1.58f, characters[i]);
             }
             else
             {
-                Move(40.0f, characters[i]);
+                Move(1.58f, characters[i]);
             }
         }
     }
@@ -93,10 +93,4 @@ public class CharacterChenge : MonoBehaviour {
         table.Add("time", time);
         iTween.MoveBy(obj, table);
     }
-
-
-
-
-
-
 }
