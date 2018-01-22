@@ -41,12 +41,12 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         turnNumber = 0;
 
 
-        // 指定の番号のみアクティブにする
-        foreach (var user in users)
-        {
-            user.active = true;
-        }
-        users[turnNumber].active = false;
+        //// 指定の番号のみアクティブにする
+        //foreach (var user in users)
+        //{
+        //    user.active = true;
+        //}
+        //users[turnNumber].active = false;
     }
 
     /// <summary>

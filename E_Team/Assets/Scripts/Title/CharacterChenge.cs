@@ -23,7 +23,9 @@ public class CharacterChenge : MonoBehaviour {
 	void Start () {
 
         afterpos = characters[characterNum].transform.position;
-
+        var v1 = characters[0].transform.position;
+        var v2 = characters[1].transform.position;
+        var dir = v1 - v2;
 	}
 	
 	// Update is called once per frame
@@ -86,7 +88,7 @@ public class CharacterChenge : MonoBehaviour {
         moveFlag = false;
     }
 
-    void Move(float direction, GameObject obj)
+    void Move(float direction, GameObject obj, float time = 1F)
     {
         Hashtable table = new Hashtable();
         table.Add("x", direction);

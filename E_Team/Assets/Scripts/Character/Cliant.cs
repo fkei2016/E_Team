@@ -13,4 +13,9 @@ public class Cliant : MonoBehaviour {
     {
         get { return Input.mousePosition; }
     }
+
+    private void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+    }
 }
