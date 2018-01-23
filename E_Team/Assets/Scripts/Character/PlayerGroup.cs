@@ -24,6 +24,7 @@ public class PlayerGroup : MonoBehaviour {
         {
             var player = Instantiate(prefabs[Client.characterNumber]);
             players[i] = player.gameObject.AttachComponet<Player>();
+            players[i].number = Client.characterNumber;
             players[i].transform.Reset(transform);
         }
         return players;

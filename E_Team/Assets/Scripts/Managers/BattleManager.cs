@@ -79,7 +79,9 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// <summary>
     /// ターン切り替え
     /// </summary>
-    public void TurnChange() {
+    public IEnumerator TurnChange(float waitTime = 1F) {
+        yield return new WaitForSeconds(waitTime);
+
         // ターン番号を更新
         if(++turnNumber >= users.Length)
         {
@@ -98,7 +100,9 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// 敵にダメージを与える
     /// </summary>
     /// <param name="damage"></param>
-    public void TakeDamageToEnemy(float damage) {
+    public IEnumerator TakeDamageToEnemy(float damage, float waitTime = 1F) {
+        yield return new WaitForSeconds(waitTime);
+
         var takeDown = target[0].TakeDamage(damage);
         //target.gameObject.SetActive(takeDown);
         target[0].PlayDamageAnimation();

@@ -138,7 +138,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
                 //  ペアの数だけ敵にダメージを与える
                 if (--remainingCards % 2 == 0)
-                    battle.TakeDamageToEnemy(50F);
+                    StartCoroutine(battle.TakeDamageToEnemy(50F));
                 // スキル上昇
                 battle.SkillUp(1F);
             }
@@ -270,7 +270,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     /// ターン切り替え
     /// </summary>
     void TurnChange() {
-        battle.TurnChange();
+        StartCoroutine(battle.TurnChange(2.5F));
         foreach (var effect in attackParticles)
         {
             effect.Attack(true);

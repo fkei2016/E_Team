@@ -69,6 +69,24 @@ public class Player : MonoBehaviour {
     /// スキル発動
     /// </summary>
     public void SkillActivation() {
+        switch (number)
+        {
+            case 0:
+                Debug.Log("特殊攻撃");
+                break;
+            case 1:
+                Debug.Log("特殊回復");
+                break;
+            case 2:
+                Debug.Log("攻撃力向上");
+                break;
+            case 3:
+                Debug.Log("ダメージカット");
+                break;
+            default:
+                break;
+        }
+
         if (active && skillGauge >= 1F)
         {
             skillTmp = 0F;
