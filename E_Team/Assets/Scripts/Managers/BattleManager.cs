@@ -16,6 +16,12 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     private float tmpHP;
     private float damageSPD;
     private int turnNumber;
+    public Text testtxt_yourID;
+    public Text testtxt_activeID;
+    public GameObject mask;
+
+    public bool turnActive;
+    private PhotonView view;
 
     public Player activeUser
     {
@@ -39,16 +45,36 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         tmpHP = hp.value;
         damageSPD = 2.5F;
         turnNumber = 0;
+        testtxt_yourID.text ="yourID:"+ PhotonNetwork.player.ID.ToString();
+        testtxt_activeID.text = "activeID:" + (turnNumber + 1);
+
+        turnActive = (turnNumber + 1 == PhotonNetwork.player.ID);
+        mask.active = !turnActive;
+        NetworkManager.instance.photonview.ObservedComponents.Add(this);
+        view = PhotonView.Get(this);
     }
 
     /// <summary>
     /// 更新時に実行
     /// </summary>
     private void Update() {
-        if(hp.value >= tmpHP)
+        testtxt_activeID.text = "activeID:" + (turnNumber + 1);
+
+        turnActive = (turnNumber + 1 == PhotonNetwork.player.ID);
+        mask.active = !turnActive;
+
+        if (hp.value >= tmpHP)
         {
             hp.value -= damageSPD;
         }
+
+        // 指定の番号のみアクティブにする
+        foreach (var user in users)
+        {
+            user.active = false;
+        }
+        users[turnNumber].active = true;
+
     }
 
     /// <summary>
@@ -60,23 +86,14 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     public void SkillUp(float upper) {
         activeUser.SkillUp(upper);
     }
-
+    
     /// <summary>
     /// ターン切り替え
     /// </summary>
     public void TurnChange() {
-        // ターン番号を更新
-        if(++turnNumber >= users.Length)
-        {
-            turnNumber = 0;
-        }
-
-        // 指定の番号のみアクティブにする
-        foreach(var user in users)
-        {
-            user.active = false;
-        }
-        users[turnNumber].active = true;
+       
+        if(turnActive)
+        view.RPC("turnchange", PhotonTargets.MasterClient);
     }
 
     /// <summary>
@@ -102,4 +119,31 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
             tmpHP -= damage;
         }
     }
+
+    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.isWriting)
+        {
+            //データの送信
+            stream.SendNext(turnNumber);
+        }
+        else
+        {
+            //データの受信
+            this.turnNumber = (int)stream.ReceiveNext();
+        }
+
+
+    }
+
+    [PunRPC]
+    private void turnchange()
+    {
+        // ターン番号を更新
+        if (++turnNumber >= users.Length)
+        {
+            turnNumber = 0;
+        }
+    }
+
 }

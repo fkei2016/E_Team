@@ -46,6 +46,8 @@ public class Player : MonoBehaviour {
 
         skillGauge = 0F;
         skillTmp = 0F;
+
+        number = PhotonNetwork.player.ID;
     }
 
     /// <summary>

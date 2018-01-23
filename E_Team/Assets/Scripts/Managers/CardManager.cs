@@ -17,7 +17,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     [SerializeField]
     private float cardRotaSpeed = 1F;
     [SerializeField]
-    private Image cardMask;
+    private Image cardMask;//maskimg
 
     private bool turnFinish;
     private int keepPairNum;
@@ -28,6 +28,9 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private CardSpacement spacement;
     private Vector3[] cardPositions;
     private BattleManager battle;
+
+    private int[] usenumlist;
+    private PhotonView view;
 
     /// <summary>
     /// 開始時に処理
@@ -40,19 +43,37 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         generator = FindObjectOfType<CardGenerator>();
         spacement = FindObjectOfType<CardSpacement>();
 
+        //自身をphotonviewに追加します
+        NetworkManager.instance.photonview.ObservedComponents.Add(this);
+
         // カードの生成
+        if(PhotonNetwork.isMasterClient)
         RemakeCards(false);
 
         // バトルの管理者と連携
         battle = BattleManager.instance;
+        view = PhotonView.Get(this);
     }
 
     /// <summary>
     /// 更新時に処理
     /// </summary>
     private void Update() {
+
+        if (useCards == null)
+        {
+            RemakeCards(false);
+            return;
+        }
+
+        if(Input.GetKeyDown(KeyCode.D))
+        {
+            RemakeCards(true);
+            return;
+        }
+
         // [Debug]ブレイクポイント
-        if(Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Break();
         }
@@ -75,7 +96,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         }
 
         // カード移動時のタッチ無効処理
-        if(useCards[0].transform.position == cardPositions[0])
+        if (useCards[0].transform.position == cardPositions[0])
         {
             if (!useCards[0].enabled)
             {
@@ -104,17 +125,14 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         //        card.OnClick(Input.mousePosition);
         //    }
         //}
-        
+
         // アクティブユーザーのクリック処理
-        if (battle.activeUser.click)
+        if (battle.activeUser.click&&battle.turnActive)
         {
-            foreach (var card in useCards)
-            {
-                card.OnClick(battle.activeUser.clickPosition);
-            }
+            view.RPC("onclick", PhotonTargets.All, battle.activeUser.clickPosition);
         }
 
-        if(turnFinish)
+        if (turnFinish)
         {
             // 敵の攻撃でプレイヤーにダメージを与える
             battle.TakeDamageToPlayer(100F);
@@ -229,26 +247,80 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             {
                 Destroy(card.gameObject);
             }
+
+            if (PhotonNetwork.isMasterClient)
+            {//共有するカード番号を破棄
+                usenumlist = new int[] { };
+            }
+        }
+
+        //マスターの更新がされていない場合はスキップします
+        if (!PhotonNetwork.isMasterClient&&usenumlist.Length==0)
+        {
+            return;
         }
 
         // カードの再生成
         useCards = MakeCards(pairNum * 2);
         // [Master]ペアリストの生成
         var list = generator.MakePairList(generator.maxDesign, useCards.Length);
+
         var array = new List<int>();
+
         for(int i = 0; i < useCards.Length; i++)
         {
             array.Add(generator.GetNonOverlappingValue(list));
         }
-        // カードに番号を割り振る
-        generator.AppendPairList(useCards, array.ToArray());
-        remainingCards = useCards.Length;
+
+        if (PhotonNetwork.isMasterClient)
+        {
+            // カードに番号を割り振る
+            generator.AppendPairList(useCards, array.ToArray());
+            remainingCards = useCards.Length;
+        }
+        else if(!PhotonNetwork.isMasterClient)
+        {
+            // 割り振られたカードを受け取る
+            generator.AppendPairList(useCards, usenumlist);
+            remainingCards = useCards.Length;
+        }
 
         // カード配置の生成と調整
         spacement.AdjustmentLayout(useCards);
         cardPositions = spacement.MakePositions(useCards);
 
+        //クライアントのカード番号を共有
+        if (PhotonNetwork.isMasterClient)
+        {
+            usenumlist = array.ToArray();
+        }
+
         // ターンを変更
         turnFinish = false;
     }
+
+
+    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+         if (stream.isWriting)
+        {
+            //データの送信
+            stream.SendNext(usenumlist);
+        }
+        else
+        {
+            //データの受信
+            this.usenumlist = (int[])stream.ReceiveNext();
+        }
+    }
+
+    [PunRPC]
+    void onclick(Vector3 _position)
+    {
+        foreach (var card in useCards)
+        {
+            card.OnClick(_position);
+        }
+    }
+
 }

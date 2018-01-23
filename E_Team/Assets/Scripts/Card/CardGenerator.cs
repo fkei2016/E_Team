@@ -48,7 +48,10 @@ public class CardGenerator : MonoBehaviour {
     /// ペアリスト
     /// </param>
     public void AppendPairList(Card[] cards, int[] pairList) {
-        for(int i = 0; i < cards.Length; i++)
+
+        if(pairList.Length==0)
+        { Debug.Log("generatorのAppendPairListに渡す時引数が初期化されました"); }
+        for (int i = 0; i < cards.Length; i++)
         {
             var number = pairList[i];
             var design = cards[i].transform.GetChild(1).gameObject;

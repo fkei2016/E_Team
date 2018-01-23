@@ -110,5 +110,7 @@ public class Card : MonoBehaviour {
             if (back.activeSelf && !rotateFlag)
                 Open();
         }
+
     }
+
 }

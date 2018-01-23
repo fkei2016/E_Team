@@ -22,7 +22,10 @@ public class NetworkManager : SingletonMonoBehaviour<NetworkManager> {
     {
         base.Awake();
 
-        PhotonNetwork.ConnectUsingSettings("ver1.0");
+        PhotonNetwork.ConnectUsingSettings("ver1.1");
+        photonview = GetComponent<PhotonView>();
+
+        DontDestroyOnLoad(this.gameObject);
     }
 
     void OnJoinedLobby()

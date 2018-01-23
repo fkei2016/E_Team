@@ -11,7 +11,7 @@ public class TouchParticle : MonoBehaviour {
     private ParticleSystem m_ClickParticleSystem;
 
     PhotonHashTable table;//ハッシュテーブル
-
+    private PhotonView view;
 
     /// <summary>
     /// 開始時に実行
@@ -26,6 +26,7 @@ public class TouchParticle : MonoBehaviour {
 
         // 座標用のハッシュテーブルを作成
         table = new PhotonHashTable();
+        view = GetComponent<PhotonView>();
     }
 
     /// <summary>
@@ -59,7 +60,7 @@ public class TouchParticle : MonoBehaviour {
             table.Add("position", position);
 
             //PhotonViewを通して全プレイヤーにPlayTouchEventを実行させる
-            NetworkManager.instance.photonview.RPC("PlayTouchEvent", PhotonTargets.AllViaServer, table);//変数同期の時はHashTableを追加してください
+            view.RPC("PlayTouchEvent", PhotonTargets.AllViaServer, table);//変数同期の時はHashTableを追加してください
         }
         else
         {
@@ -71,6 +72,8 @@ public class TouchParticle : MonoBehaviour {
         m_ClickParticleSystem.Play();
     }
 
+    
+   
     [PunRPC]
     private void PlayTouchEvent(PhotonHashTable _table) {
         object value = null;
