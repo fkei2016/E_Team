@@ -4,42 +4,26 @@ using UnityEngine;
 
 public class CharacterChenge : MonoBehaviour {
 
-    [SerializeField]
-    private GameObject[] characters;
-
-    private Vector3 afterpos;
-
-    [SerializeField]
     private int characterNum = 0;
+    
 
-    [SerializeField]
     private bool moveFlag = false;
 
-    private float time = 1.0f;
+    [SerializeField]
+    private float width;
 
-    private float delTime = 0.0f;
+    [SerializeField]
+    private int maxcharacter = 4;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
 
-        afterpos = characters[characterNum].transform.position;
-        var v1 = characters[0].transform.position;
-        var v2 = characters[1].transform.position;
-        var dir = v1 - v2;
 	}
 	
 	// Update is called once per frame
 	void Update () {
 
-        if (moveFlag)
-        {
-            delTime += Time.deltaTime;
-            if (delTime > 1.0f)
-            {
-                moveFlag = false;
-                delTime = 0.0f;
-            }
-        }
+      
     }
 
     public void AddCharacterNum(int num)
@@ -48,38 +32,18 @@ public class CharacterChenge : MonoBehaviour {
         {
             moveFlag = true;
             characterNum += num;
-            CharacterMove(num);
-
-            Client.characterNumber = characterNum;
+            CharacterMove();
         }
     }
 
 
-    void CharacterMove(int num)
+    void CharacterMove()
     {
 
-        if (characterNum == characters.Length)
-        {
-            characterNum = characters.Length - 1;
-            return;
-        }
-        if (characterNum == -1)
-        {
-            characterNum = 0;
-            return;
-        }
+        characterNum = Mathf.Clamp(characterNum, 0, maxcharacter - 1);
 
-        for (int i = 0; i < characters.Length; i++)
-        {
-            if (num == 1)
-            {
-                Move(-1.58f, characters[i]);
-            }
-            else
-            {
-                Move(1.58f, characters[i]);
-            }
-        }
+        Move(-width * characterNum);
+
     }
 
     void MoveEnd()
@@ -87,11 +51,13 @@ public class CharacterChenge : MonoBehaviour {
         moveFlag = false;
     }
 
-    void Move(float direction, GameObject obj, float time = 1F)
+    void Move(float direction,float time = 1F)
     {
         Hashtable table = new Hashtable();
         table.Add("x", direction);
         table.Add("time", time);
-        iTween.MoveBy(obj, table);
+        table.Add("islocal", true);
+        table.Add("oncomplete", "MoveEnd");
+        iTween.MoveTo(gameObject, table);
     }
 }
