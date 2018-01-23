@@ -5,29 +5,26 @@ using UnityEngine;
 public class CharacterChenge : MonoBehaviour {
 
     private int characterNum = 0;
-    
 
     private bool moveFlag = false;
 
     [SerializeField]
     private float width;
 
-    [SerializeField]
-    private int maxcharacter = 4;
-
-    // Use this for initialization
-    void Start () {
-
-	}
-	
-	// Update is called once per frame
+    /// <summary>
+    /// 更新時に実行
+    /// </summary>
 	void Update () {
-
-      
+        Client.characterNumber = characterNum % (transform.childCount - 1);
     }
 
-    public void AddCharacterNum(int num)
-    {
+    /// <summary>
+    /// キャラクター番号の変更
+    /// </summary>
+    /// <param name="num">
+    /// 番号の移動数
+    /// </param>
+    public void AddCharacterNum(int num) {
         if (!moveFlag)
         {
             moveFlag = true;
@@ -36,23 +33,35 @@ public class CharacterChenge : MonoBehaviour {
         }
     }
 
-
-    void CharacterMove()
-    {
-
-        characterNum = Mathf.Clamp(characterNum, 0, maxcharacter - 1);
-
+    /// <summary>
+    /// キャラクターの移動処理
+    /// </summary>
+    void CharacterMove() {
+        // 範囲内にクランプ
+        characterNum = Mathf.Clamp(characterNum, 0, transform.childCount - 1);
+        // 番号分だけ移動
         Move(-width * characterNum);
 
     }
 
-    void MoveEnd()
-    {
+    /// <summary>
+    /// 移動の終了
+    /// </summary>
+    void MoveEnd() {
+        // メゾット名で呼び出される
         moveFlag = false;
     }
 
-    void Move(float direction,float time = 1F)
-    {
+    /// <summary>
+    ///  移動処理
+    /// </summary>
+    /// <param name="direction">
+    /// X軸移動量
+    /// </param>
+    /// <param name="time">
+    /// 移動時間
+    /// </param>
+    void Move(float direction,float time = 1F) {
         Hashtable table = new Hashtable();
         table.Add("x", direction);
         table.Add("time", time);

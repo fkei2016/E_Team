@@ -11,7 +11,8 @@ public class Player : MonoBehaviour {
     private Image skill;
     private GameObject mask;
 
-    private float skillTmp;
+    [SerializeField, Range(0, 1)]
+    private float skillTmp = 0F;
 
     private float skillGauge
     {
@@ -20,7 +21,7 @@ public class Player : MonoBehaviour {
     }
     public bool active
     {
-        get { return mask.activeSelf; }
+        get { return !mask.activeSelf; }
         set { mask.SetActive(value); }
     }
 
@@ -30,15 +31,14 @@ public class Player : MonoBehaviour {
 	void Awake () {
         skill = transform.GetChild(1).GetComponent<Image>();
         mask = transform.GetChild(3).gameObject;
+    }
 
+    private void Start() {
         // クリックでスキル発動処理の実行
         gameObject.AddEventTrigger(UnityEngine.EventSystems.EventTriggerType.PointerUp,
-            data =>{ SkillActivation(); });
+            data => { SkillActivation(); });
 
-        skillGauge = 0F;
-        skillTmp = 0F;
-
-        number = PhotonNetwork.player.ID;
+        skillGauge = skillTmp;
     }
 
     /// <summary>

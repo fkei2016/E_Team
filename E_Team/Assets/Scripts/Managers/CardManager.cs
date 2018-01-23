@@ -138,7 +138,10 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
                 //  ペアの数だけ敵にダメージを与える
                 if (--remainingCards % 2 == 0)
-                    StartCoroutine(battle.TakeDamageToEnemy(50F));
+                {
+                    var on = 3F * ((!turnFinish && remainingCards <= 0) ? 1 : 0);
+                    StartCoroutine(battle.TakeDamageToEnemy(50F, 1F + on));
+                }
                 // スキル上昇
                 battle.SkillUp(1F);
             }
@@ -153,7 +156,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             battle.TakeDamageToPlayer(100F);
 
             // ターンの切り替え
-            TurnChange();
+            TurnChange(2.5F);
         }
 
         // 全消しの検知
@@ -166,7 +169,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         if (!turnFinish && remainingCards <= 0)
         {
             RemakeCards();
-            TurnChange();
+            TurnChange(2F);
         }
     }
 
@@ -269,8 +272,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     /// <summary>
     /// ターン切り替え
     /// </summary>
-    void TurnChange() {
-        StartCoroutine(battle.TurnChange(2.5F));
+    void TurnChange(float waitTime = 1F) {
+        StartCoroutine(battle.TurnChange(waitTime));
         foreach (var effect in attackParticles)
         {
             effect.Attack(true);

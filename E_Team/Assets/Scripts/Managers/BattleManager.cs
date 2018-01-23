@@ -24,7 +24,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         {
             foreach(var user in users)
             {
-                if(!user.active)
+                if(user.active)
                 {
                     return user;
                 }
@@ -43,17 +43,13 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
 
         target = FindObjectsOfType<Enemy>();
         users = playerGroup.Create(4);
-        foreach(var user in users)
-        {
-            user.active = false;
-        }
 
-        //// 指定の番号のみアクティブにする
-        //foreach (var user in users)
-        //{
-        //    user.active = true;
-        //}
-        //users[turnNumber].active = false;
+        // 指定の番号のみアクティブにする
+        foreach (var user in users)
+        {
+            user.active = true;
+        }
+        users[turnNumber].active = false;
     }
 
     /// <summary>
@@ -103,6 +99,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     public IEnumerator TakeDamageToEnemy(float damage, float waitTime = 1F) {
         yield return new WaitForSeconds(waitTime);
 
+        Debug.Log("PASS");
         var takeDown = target[0].TakeDamage(damage);
         //target.gameObject.SetActive(takeDown);
         target[0].PlayDamageAnimation();
