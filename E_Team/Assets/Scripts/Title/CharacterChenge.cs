@@ -15,7 +15,7 @@ public class CharacterChenge : MonoBehaviour {
     /// 更新時に実行
     /// </summary>
 	void Update () {
-        Client.characterNumber = characterNum % (transform.childCount - 1);
+        Client.characterNumber = characterNum % (transform.childCount);
     }
 
     /// <summary>

@@ -100,6 +100,12 @@ public class Card : MonoBehaviour {
         isPlayFade = true;
     }
 
+    /// <summary>
+    /// クリック処理
+    /// </summary>
+    /// <param name="position">
+    /// クリック座標
+    /// </param>
     public void OnClick(Vector3 position) {
         var worldPosition = Camera.main.WorldToScreenPoint(transform.position);
 

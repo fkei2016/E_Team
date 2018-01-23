@@ -31,13 +31,6 @@ public class Player : MonoBehaviour {
 	void Awake () {
         skill = transform.GetChild(1).GetComponent<Image>();
         mask = transform.GetChild(3).gameObject;
-    }
-
-    private void Start() {
-        // クリックでスキル発動処理の実行
-        gameObject.AddEventTrigger(UnityEngine.EventSystems.EventTriggerType.PointerUp,
-            data => { SkillActivation(); });
-
         skillGauge = skillTmp;
     }
 
@@ -66,35 +59,23 @@ public class Player : MonoBehaviour {
     }
 
     /// <summary>
-    /// スキル発動
+    /// クリック処理
     /// </summary>
-    public void SkillActivation() {
-        switch (number)
-        {
-            case 0:
-                Debug.Log("特殊攻撃");
-                break;
-            case 1:
-                Debug.Log("特殊回復");
-                break;
-            case 2:
-                Debug.Log("攻撃力向上");
-                break;
-            case 3:
-                Debug.Log("ダメージカット");
-                break;
-            default:
-                break;
-        }
+    /// <param name="position">
+    /// クリック座標
+    /// </param>
+    public bool OnClick(Vector3 position) {
+        var worldPosition = Camera.main.WorldToScreenPoint(transform.position);
+        var size = GetComponent<RectTransform>().sizeDelta;
 
-        if (active && skillGauge >= 1F)
+        // 矩形とクリック座標の交点で判定
+        Rect rect = new Rect(worldPosition.x - size.x / 2, worldPosition.y - size.y / 2, size.x, size.y);
+        if (rect.Contains(position) && skillGauge >= 1F)
         {
+            // 値を初期化
             skillTmp = 0F;
-            Debug.Log("Use Skill !!");
+            return true;
         }
-        else
-        {
-            Debug.Log("Dont use Skill...");
-        }
+        return false;
     }
 }

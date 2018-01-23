@@ -11,6 +11,9 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     [SerializeField]
     private PlayerGroup playerGroup;
 
+    [SerializeField]
+    private SkillParticle skill;
+
     private float tmpHP;
     private float damageSPD;
     private int turnNumber;
@@ -60,6 +63,14 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         {
             playerHP.value -= damageSPD;
         }
+
+        if(Client.click)
+        {
+            if (activeUser.OnClick(Client.clickPosition))
+            {
+                skill.Emission(activeUser.number, activeUser.transform.position + Vector3.down);
+            }
+        }
     }
 
     /// <summary>
@@ -95,11 +106,12 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// <summary>
     /// 敵にダメージを与える
     /// </summary>
-    /// <param name="damage"></param>
+    /// <param name="damage">
+    /// ダメージ量
+    /// </param>
     public IEnumerator TakeDamageToEnemy(float damage, float waitTime = 1F) {
         yield return new WaitForSeconds(waitTime);
 
-        Debug.Log("PASS");
         var takeDown = target[0].TakeDamage(damage);
         //target.gameObject.SetActive(takeDown);
         target[0].PlayDamageAnimation();

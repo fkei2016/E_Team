@@ -21,6 +21,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
     private bool turnFinish;
     private int keepPairNum;
+    private int completeNum;
     private Card[] useCards;
     private int remainingCards;
     private Stack<Card> pairCard;
@@ -130,6 +131,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // ペア成立の処理
         if (turnFinish || pairCard.Count >= remainingCards)
         {
+            Debug.Log(completeNum);
             while (pairCard.Count > 0)
             {
                 // カードのフェードアウト
@@ -139,8 +141,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 //  ペアの数だけ敵にダメージを与える
                 if (--remainingCards % 2 == 0)
                 {
-                    var on = 3F * ((!turnFinish && remainingCards <= 0) ? 1 : 0);
-                    StartCoroutine(battle.TakeDamageToEnemy(50F, 1F + on));
+                    var waitTime = (completeNum < useCards.Length) ? 1F : 4F;
+                    StartCoroutine(battle.TakeDamageToEnemy(50F, waitTime));
                 }
                 // スキル上昇
                 battle.SkillUp(1F);
@@ -181,6 +183,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     public void SendCard(Card card) {
         // カードを積む
         pairCard.Push(card);
+        completeNum++;
 
         // ペアが組まれた場合
         if (pairCard.Count % 2 == 0)
@@ -201,6 +204,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 // カードを閉じる
                 StartCoroutine(card1.Close(1.5F));
                 StartCoroutine(card2.Close(1.5F));
+                completeNum--;
+                completeNum--;
             }
             else
             {
@@ -267,6 +272,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
         // ターンを変更
         turnFinish = false;
+        completeNum = 0;
     }
 
     /// <summary>
