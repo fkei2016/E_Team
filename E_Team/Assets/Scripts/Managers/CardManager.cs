@@ -8,9 +8,9 @@ using UnityEngine.UI;
 
 public class CardManager : SingletonMonoBehaviour<CardManager> {
 
-    public int cliantNumber = 0;
+    public int ClientNumber = 0;
     [SerializeField]
-    private int maxCliant = 4;
+    private int maxClient = 4;
 
     [SerializeField, Range(2, 6)]
     private int pairNum = 3;
@@ -119,11 +119,11 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         //}
 
         // アクティブユーザーのクリック処理
-        if (Cliant.click)
+        if (Client.click)
         {
             foreach (var card in useCards)
             {
-                card.OnClick(Cliant.clickPosition);
+                card.OnClick(Client.clickPosition);
             }
         }
 

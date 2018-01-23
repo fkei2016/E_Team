@@ -27,7 +27,7 @@ public class Player : MonoBehaviour {
     /// <summary>
     /// 開始時に実行
     /// </summary>
-	void Start () {
+	void Awake () {
         skill = transform.GetChild(1).GetComponent<Image>();
         mask = transform.GetChild(3).gameObject;
 

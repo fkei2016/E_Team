@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Cliant : MonoBehaviour {
+public class Client : SingletonMonoBehaviour<Client> {
 
     static public bool click
     {
@@ -14,8 +14,5 @@ public class Cliant : MonoBehaviour {
         get { return Input.mousePosition; }
     }
 
-    private void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
-    }
+    static public int characterNumber = 0;
 }

@@ -10,7 +10,7 @@ public class CharacterChenge : MonoBehaviour {
     private Vector3 afterpos;
 
     [SerializeField]
-    private int characterNum = 1;
+    private int characterNum = 0;
 
     [SerializeField]
     private bool moveFlag = false;
@@ -40,9 +40,6 @@ public class CharacterChenge : MonoBehaviour {
                 delTime = 0.0f;
             }
         }
-
-
-
     }
 
     public void AddCharacterNum(int num)
@@ -52,6 +49,8 @@ public class CharacterChenge : MonoBehaviour {
             moveFlag = true;
             characterNum += num;
             CharacterMove(num);
+
+            Client.characterNumber = characterNum;
         }
     }
 

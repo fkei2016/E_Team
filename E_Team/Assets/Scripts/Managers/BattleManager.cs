@@ -6,16 +6,17 @@ using UnityEngine.UI;
 public class BattleManager : SingletonMonoBehaviour<BattleManager> {
 
     [SerializeField]
-    private Slider hp;
-    
+    private Slider playerHP;
+
     [SerializeField]
-    private Enemy[] target;
-    [SerializeField]
-    private Player[] users;
+    private PlayerGroup playerGroup;
 
     private float tmpHP;
     private float damageSPD;
     private int turnNumber;
+
+    private Enemy[] target;
+    private Player[] users;
 
     public Player activeUser
     {
@@ -36,10 +37,16 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// 開始時に実行
     /// </summary>
     private void Start() {
-        tmpHP = hp.value;
+        tmpHP = playerHP.value;
         damageSPD = 2.5F;
         turnNumber = 0;
 
+        target = FindObjectsOfType<Enemy>();
+        users = playerGroup.Create(4);
+        foreach(var user in users)
+        {
+            user.active = false;
+        }
 
         //// 指定の番号のみアクティブにする
         //foreach (var user in users)
@@ -53,9 +60,9 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// 更新時に実行
     /// </summary>
     private void Update() {
-        if(hp.value >= tmpHP)
+        if(playerHP.value >= tmpHP)
         {
-            hp.value -= damageSPD;
+            playerHP.value -= damageSPD;
         }
     }
 

@@ -33,9 +33,9 @@ public class TouchParticle : MonoBehaviour {
     /// </summary>
     void Update() {
         // クリック処理
-        if (Cliant.click)
+        if (Client.click)
         {
-            Emission(Cliant.clickPosition);
+            Emission(Client.clickPosition);
         }
     }
 
