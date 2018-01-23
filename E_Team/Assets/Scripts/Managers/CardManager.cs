@@ -8,16 +8,16 @@ using UnityEngine.UI;
 
 public class CardManager : SingletonMonoBehaviour<CardManager> {
 
-    public int cliantNumber = 0;
+    public int ClientNumber = 0;
     [SerializeField]
-    private int maxCliant = 4;
+    private int maxClient = 4;
 
     [SerializeField, Range(2, 6)]
     private int pairNum = 3;
     [SerializeField]
     private float cardRotaSpeed = 1F;
     [SerializeField]
-    private Image cardMask;//maskimg
+    private Image cardMask;
 
     private bool turnFinish;
     private int keepPairNum;
@@ -29,8 +29,18 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private Vector3[] cardPositions;
     private BattleManager battle;
 
-    private int[] usenumlist;
-    private PhotonView view;
+    [Header("AttakParticle")]
+
+    //藤井追加分
+    [SerializeField]
+    private GameObject attackEffeckPrefab;
+    [SerializeField]
+    private GameObject enemy;
+    [SerializeField]
+    private List<AttackParticle> attackParticles;
+    [SerializeField]
+    private GameObject effectPearent;
+
 
     /// <summary>
     /// 開始時に処理
@@ -43,37 +53,19 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         generator = FindObjectOfType<CardGenerator>();
         spacement = FindObjectOfType<CardSpacement>();
 
-        //自身をphotonviewに追加します
-        NetworkManager.instance.photonview.ObservedComponents.Add(this);
-
         // カードの生成
-        if(PhotonNetwork.isMasterClient)
         RemakeCards(false);
 
         // バトルの管理者と連携
         battle = BattleManager.instance;
-        view = PhotonView.Get(this);
     }
 
     /// <summary>
     /// 更新時に処理
     /// </summary>
     private void Update() {
-
-        if (useCards == null)
-        {
-            RemakeCards(false);
-            return;
-        }
-
-        if(Input.GetKeyDown(KeyCode.D))
-        {
-            RemakeCards(true);
-            return;
-        }
-
         // [Debug]ブレイクポイント
-        if (Input.GetKeyDown(KeyCode.Space))
+        if(Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Break();
         }
@@ -96,7 +88,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         }
 
         // カード移動時のタッチ無効処理
-        if (useCards[0].transform.position == cardPositions[0])
+        if(useCards[0].transform.position == cardPositions[0])
         {
             if (!useCards[0].enabled)
             {
@@ -127,49 +119,54 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         //}
 
         // アクティブユーザーのクリック処理
-        if (battle.activeUser.click&&battle.turnActive)
+        if (Client.click)
         {
-            view.RPC("onclick", PhotonTargets.All, battle.activeUser.clickPosition);
+            foreach (var card in useCards)
+            {
+                card.OnClick(Client.clickPosition);
+            }
         }
 
-        if (turnFinish)
-        {
-            // 敵の攻撃でプレイヤーにダメージを与える
-            battle.TakeDamageToPlayer(100F);
-
-            // ターンの切り替え
-            battle.TurnChange();
-        }
-
-        // ターン交代のタイミング
+        // ペア成立の処理
         if (turnFinish || pairCard.Count >= remainingCards)
         {
-            // 成立したペアを消す
-            turnFinish = false;
             while (pairCard.Count > 0)
             {
                 // カードのフェードアウト
                 var card = pairCard.Pop();
                 StartCoroutine(card.FadeOut(2F));
-                --remainingCards;
 
                 //  ペアの数だけ敵にダメージを与える
-                if (remainingCards % 2 == 0)
-                    battle.TakeDamageToEnemy();
+                if (--remainingCards % 2 == 0)
+                    battle.TakeDamageToEnemy(50F);
                 // スキル上昇
                 battle.SkillUp(1F);
             }
         }
 
-        foreach(var card in useCards)
+        // ターン終了時の攻撃
+        if (turnFinish)
+        {
+            turnFinish = false;
+
+            // 敵の攻撃でプレイヤーにダメージを与える
+            battle.TakeDamageToPlayer(100F);
+
+            // ターンの切り替え
+            TurnChange();
+        }
+
+        // 全消しの検知
+        foreach (var card in useCards)
         {
             if(!card.isFinish) return;
         }
 
+        // 再配布とターン切り替え
         if (!turnFinish && remainingCards <= 0)
         {
-            // カードの再生成
             RemakeCards();
+            TurnChange();
         }
     }
 
@@ -204,11 +201,10 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             }
             else
             {
-                // ペア成立のエフェクト
-                var comboFX = GetComponent<TouchCombo>();
-                StartCoroutine(comboFX.Emission(card1.transform));
-                StartCoroutine(comboFX.Emission(card2.transform));
-                // 成立したペアをスタック
+                // ペアパーティクルの発生
+                PairParticle(card1, GetComponent<TouchCombo>());
+                PairParticle(card2, GetComponent<TouchCombo>());
+                // ペアカードを積む
                 pairCard.Push(card1);
                 pairCard.Push(card2);
             }
@@ -247,80 +243,56 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             {
                 Destroy(card.gameObject);
             }
-
-            if (PhotonNetwork.isMasterClient)
-            {//共有するカード番号を破棄
-                usenumlist = new int[] { };
-            }
-        }
-
-        //マスターの更新がされていない場合はスキップします
-        if (!PhotonNetwork.isMasterClient&&usenumlist.Length==0)
-        {
-            return;
         }
 
         // カードの再生成
         useCards = MakeCards(pairNum * 2);
         // [Master]ペアリストの生成
         var list = generator.MakePairList(generator.maxDesign, useCards.Length);
-
         var array = new List<int>();
-
         for(int i = 0; i < useCards.Length; i++)
         {
             array.Add(generator.GetNonOverlappingValue(list));
         }
-
-        if (PhotonNetwork.isMasterClient)
-        {
-            // カードに番号を割り振る
-            generator.AppendPairList(useCards, array.ToArray());
-            remainingCards = useCards.Length;
-        }
-        else if(!PhotonNetwork.isMasterClient)
-        {
-            // 割り振られたカードを受け取る
-            generator.AppendPairList(useCards, usenumlist);
-            remainingCards = useCards.Length;
-        }
+        // カードに番号を割り振る
+        generator.AppendPairList(useCards, array.ToArray());
+        remainingCards = useCards.Length;
 
         // カード配置の生成と調整
         spacement.AdjustmentLayout(useCards);
         cardPositions = spacement.MakePositions(useCards);
 
-        //クライアントのカード番号を共有
-        if (PhotonNetwork.isMasterClient)
-        {
-            usenumlist = array.ToArray();
-        }
-
         // ターンを変更
         turnFinish = false;
     }
 
-
-    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-         if (stream.isWriting)
+    /// <summary>
+    /// ターン切り替え
+    /// </summary>
+    void TurnChange() {
+        battle.TurnChange();
+        foreach (var effect in attackParticles)
         {
-            //データの送信
-            stream.SendNext(usenumlist);
-        }
-        else
-        {
-            //データの受信
-            this.usenumlist = (int[])stream.ReceiveNext();
+            effect.Attack(true);
         }
     }
 
-    [PunRPC]
-    void onclick(Vector3 _position)
-    {
-        foreach (var card in useCards)
-        {
-            card.OnClick(_position);
-        }
+    /// <summary>
+    /// ペアのパーティクル設定
+    /// </summary>
+    /// <param name="card">
+    /// 対象カード
+    /// </param>
+    /// <param name="combo">
+    /// コンボパーティクル
+    /// </param>
+    void PairParticle(Card card, TouchCombo combo) {
+        // コンボ発生
+        StartCoroutine(combo.Emission(card.transform));
+        // 攻撃エフェクト発生
+        var fx = Instantiate(attackEffeckPrefab, effectPearent.transform);
+        var attack = fx.GetComponent<AttackParticle>();
+        attack.Emission(card.size / Camera.main.farClipPlane, card.gameObject, enemy);
+        attackParticles.Add(attack);
     }
-
 }

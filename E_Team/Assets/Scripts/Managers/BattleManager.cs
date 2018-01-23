@@ -6,22 +6,17 @@ using UnityEngine.UI;
 public class BattleManager : SingletonMonoBehaviour<BattleManager> {
 
     [SerializeField]
-    private Slider hp;
-    
+    private Slider playerHP;
+
     [SerializeField]
-    private Enemy[] target;
-    [SerializeField]
-    private Player[] users;
+    private PlayerGroup playerGroup;
 
     private float tmpHP;
     private float damageSPD;
     private int turnNumber;
-    public Text testtxt_yourID;
-    public Text testtxt_activeID;
-    public GameObject mask;
 
-    public bool turnActive;
-    private PhotonView view;
+    private Enemy[] target;
+    private Player[] users;
 
     public Player activeUser
     {
@@ -29,7 +24,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         {
             foreach(var user in users)
             {
-                if(user.active)
+                if(!user.active)
                 {
                     return user;
                 }
@@ -42,39 +37,33 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// 開始時に実行
     /// </summary>
     private void Start() {
-        tmpHP = hp.value;
+        tmpHP = playerHP.value;
         damageSPD = 2.5F;
         turnNumber = 0;
-        testtxt_yourID.text ="yourID:"+ PhotonNetwork.player.ID.ToString();
-        testtxt_activeID.text = "activeID:" + (turnNumber + 1);
 
-        turnActive = (turnNumber + 1 == PhotonNetwork.player.ID);
-        mask.active = !turnActive;
-        NetworkManager.instance.photonview.ObservedComponents.Add(this);
-        view = PhotonView.Get(this);
+        target = FindObjectsOfType<Enemy>();
+        users = playerGroup.Create(4);
+        foreach(var user in users)
+        {
+            user.active = false;
+        }
+
+        //// 指定の番号のみアクティブにする
+        //foreach (var user in users)
+        //{
+        //    user.active = true;
+        //}
+        //users[turnNumber].active = false;
     }
 
     /// <summary>
     /// 更新時に実行
     /// </summary>
     private void Update() {
-        testtxt_activeID.text = "activeID:" + (turnNumber + 1);
-
-        turnActive = (turnNumber + 1 == PhotonNetwork.player.ID);
-        mask.active = !turnActive;
-
-        if (hp.value >= tmpHP)
+        if(playerHP.value >= tmpHP)
         {
-            hp.value -= damageSPD;
+            playerHP.value -= damageSPD;
         }
-
-        // 指定の番号のみアクティブにする
-        foreach (var user in users)
-        {
-            user.active = false;
-        }
-        users[turnNumber].active = true;
-
     }
 
     /// <summary>
@@ -86,22 +75,31 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     public void SkillUp(float upper) {
         activeUser.SkillUp(upper);
     }
-    
+
     /// <summary>
     /// ターン切り替え
     /// </summary>
     public void TurnChange() {
-       
-        if(turnActive)
-        view.RPC("turnchange", PhotonTargets.MasterClient);
+        // ターン番号を更新
+        if(++turnNumber >= users.Length)
+        {
+            turnNumber = 0;
+        }
+
+        // 指定の番号のみアクティブにする
+        foreach(var user in users)
+        {
+            user.active = true;
+        }
+        users[turnNumber].active = false;
     }
 
     /// <summary>
     /// 敵にダメージを与える
     /// </summary>
     /// <param name="damage"></param>
-    public void TakeDamageToEnemy() {
-        var takeDown = target[0].TakeDamage();
+    public void TakeDamageToEnemy(float damage) {
+        var takeDown = target[0].TakeDamage(damage);
         //target.gameObject.SetActive(takeDown);
         target[0].PlayDamageAnimation();
     }
@@ -119,31 +117,4 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
             tmpHP -= damage;
         }
     }
-
-    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.isWriting)
-        {
-            //データの送信
-            stream.SendNext(turnNumber);
-        }
-        else
-        {
-            //データの受信
-            this.turnNumber = (int)stream.ReceiveNext();
-        }
-
-
-    }
-
-    [PunRPC]
-    private void turnchange()
-    {
-        // ターン番号を更新
-        if (++turnNumber >= users.Length)
-        {
-            turnNumber = 0;
-        }
-    }
-
 }

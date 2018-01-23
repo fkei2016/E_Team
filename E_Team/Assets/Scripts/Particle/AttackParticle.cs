@@ -4,102 +4,149 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class AttackParticle : MonoBehaviour {
-    
 
-    private Vector2[] fourCorners= {new Vector2(0,0), new Vector2(1, 0), new Vector2(1.0f, 1.5f), new Vector2(0, 1.5f) };
 
-    [SerializeField]
-    private GameObject fourCornerTarget;
+    private Vector2[] fourCorners = {
+        Vector2.up + Vector2.left,
+        Vector2.up + Vector2.right,
+        Vector2.down + Vector2.right,
+        Vector2.down + Vector2.left,
+    };
 
-    [SerializeField]
     private int patrol = 0;
-
+    private bool attackFlag = false;
     private bool moveFlag = false;
-
-    [SerializeField]
+    private Vector2 rectSize;
+    private GameObject shooter;
     private GameObject target;
 
-    [SerializeField]
-    private bool attackFlag;
 
     [SerializeField]
     private iTween.EaseType easetype;
-
     [SerializeField]
     private ParticleSystem wildfire;
-
     [SerializeField]
     private ParticleSystem explosion;
+
 
     //パーティクルのサイズ
     [SerializeField]
     private float particleSize = 1.0f;
 
-    public float ParticleSize
-    {
-        set
-        {
-            particleSize = value;
-            GetComponent<ParticleSystem>().startSize = particleSize;
-        }
-        get
-        {
-            return particleSize;
-        }
+
+    /// <summary>
+    /// 開始時に実行
+    /// </summary>
+    void Start () {
+        GetComponent<ParticleSystem>().startSize = particleSize;
     }
 
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-
-
-        GetComponent<ParticleSystem>().startSize = particleSize;
-
-        //巡回
+    /// <summary>
+    /// 更新時に実行
+    /// </summary>
+    void Update () {
         if (!attackFlag)
         {
-            if (!moveFlag)
-            {
-                moveFlag = true;
-                Hashtable table = new Hashtable();
-                table.Add("easeType", easetype);
-                var targetSpriteSize = fourCornerTarget.GetComponent<SpriteRenderer>().bounds.size / 2;
-                table.Add("x", fourCornerTarget.transform.position.x - targetSpriteSize.x + fourCorners[patrol].x - fourCornerTarget.transform.position.x / 10.0f + 0.1f);
-                table.Add("y", fourCornerTarget.transform.position.y + targetSpriteSize.y - fourCorners[patrol].y - fourCornerTarget.transform.position.y / 10.0f - 0.1f);
-                table.Add("time", 1.0f);
-                table.Add("oncomplete", "ChangePatrol");
-                iTween.MoveTo(gameObject,table);
-            }
+            Move();
         }
-
-        //攻撃
-        if (attackFlag)
+        else
         {
-            wildfire.gameObject.SetActive(true);
-            Hashtable table = new Hashtable();
-            table.Add("easeType", easetype);
-            table.Add("x", target.transform.position.x);
-            table.Add("y", target.transform.position.y);
-            table.Add("time", 1.0f);
-            table.Add("oncomplete", "attackDestroy");
-            iTween.MoveTo(gameObject, table);
+            Attack();
         }
     }
 
-    void ChangePatrol()
-    {
-        patrol++;
-        if (patrol == 4)
-            patrol = 0;
+    /// <summary>
+    /// パーティクルの発生
+    /// </summary>
+    /// <param name="size">
+    /// 矩形のサイズ
+    /// </param>
+    /// <param name="shooter">
+    /// 発射するオブジェクト
+    /// </param>
+    /// <param name="target">
+    /// 被弾するオブジェクト
+    /// </param>
+    /// <returns>
+    /// リストへ追加される
+    /// </returns>
+    public AttackParticle Emission(Vector2 size, GameObject shooter, GameObject target) {
+        //// ワールド座標（深度付き）への変換
+        //transform.position = Camera.main.ScreenToWorldPoint(screenPosition);
+        //transform.position = Vector3.forward * 80F;
+        // 初期値の設定
+        this.rectSize = size;
+        this.shooter = shooter;
+        this.target = target;
+        return this;
+    }
+
+    /// <summary>
+    /// 移動処理
+    /// </summary>
+    void Move() {
+        if (!moveFlag)
+        {
+            moveFlag = true;
+            var v2 = new Vector2(shooter.transform.position.x - rectSize.x * fourCorners[patrol].x,
+                shooter.transform.position.y + rectSize.y * fourCorners[patrol].y);
+            SetHash(v2, "ChangePatrol");
+        }
+    }
+
+    /// <summary>
+    /// 攻撃処理
+    /// </summary>
+    private void Attack() {
+        wildfire.gameObject.SetActive(true);
+        SetHash(target.transform.position, "attackDestroy");
+    }
+
+    /// <summary>
+    ///  攻撃命令
+    /// </summary>
+    /// <param name="flag">
+    /// 攻撃の有無
+    /// </param>
+    public void Attack(bool flag) {
+        attackFlag = flag;
+    }
+
+
+    /// <summary>
+    /// ハッシュテーブルへの設定
+    /// </summary>
+    /// <param name="position">
+    /// ２次元座標
+    /// </param>
+    /// <param name="method">
+    /// 関数名
+    /// </param>
+    /// <param name="time">
+    /// 時間
+    /// </param>
+    void SetHash(Vector2 position, string method, float time = 1F) {
+        var table = new Hashtable();
+        table.Add("easeType", easetype);
+        table.Add("x", position.x);
+        table.Add("y", position.y);
+        table.Add("time", time);
+        table.Add("oncomplete", method);
+        iTween.MoveTo(gameObject, table);
+    }
+
+    /// <summary>
+    /// 巡回番号の変更
+    /// </summary>
+    void ChangePatrol() {
+        if (++patrol == 4) patrol = 0;
         moveFlag = false;
     }
 
-    void attackDestroy()
-    {
+    /// <summary>
+    /// オブジェクト破棄
+    /// </summary>
+    void attackDestroy() {
         explosion.gameObject.SetActive(true);
         Destroy(this.gameObject,1.0f);
     }
