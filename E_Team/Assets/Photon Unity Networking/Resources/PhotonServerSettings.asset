@@ -48,4 +48,5 @@ MonoBehaviour:
   - GetNums
   - GetValue
   - getcard
+  - Order
   DisableAutoOpenWizard: 1
