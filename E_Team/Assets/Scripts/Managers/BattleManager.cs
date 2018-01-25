@@ -18,6 +18,9 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     private float damageSPD;
     private int turnNumber;
 
+    private float damageCut = 1F;
+    private float attackBonus = 1F;
+
     private Enemy[] target;
     private Player[] users;
 
@@ -59,16 +62,37 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// 更新時に実行
     /// </summary>
     private void Update() {
-        if(playerHP.value >= tmpHP)
+        if(playerHP.value > tmpHP)
         {
             playerHP.value -= damageSPD;
+        }
+        else if(playerHP.value < tmpHP)
+        {
+            playerHP.value += damageSPD;
         }
 
         if(Client.click)
         {
             if (activeUser.OnClick(Client.clickPosition))
             {
-                skill.Emission(activeUser.number, activeUser.transform.position + Vector3.down);
+                skill.Emission(activeUser.number, activeUser.transform.position + Vector3.down, 5F);
+                switch(activeUser.number)
+                {
+                    case 0:
+
+                        break;
+                    case 1:
+                        tmpHP += 100F;
+                        break;
+                    case 2:
+                        attackBonus = 2F;
+                        break;
+                    case 3:
+                        damageCut = 0.5F;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
@@ -109,12 +133,17 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// <param name="damage">
     /// ダメージ量
     /// </param>
-    public IEnumerator TakeDamageToEnemy(float damage, float waitTime = 1F) {
+    public IEnumerator TakeDamageToEnemy(float waitTime = 1F) {
+        // 遅延演出
         yield return new WaitForSeconds(waitTime);
 
-        var takeDown = target[0].TakeDamage(damage);
+        // ダメージ計算とアニメーション
+        var takeDown = target[0].TakeDamage(playerGroup.atkPower * attackBonus);
         //target.gameObject.SetActive(takeDown);
         target[0].PlayDamageAnimation();
+
+        // 攻撃力向上の解除
+        if (attackBonus >= 1F) attackBonus = 1F;
     }
 
     /// <summary>
@@ -123,11 +152,13 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// <param name="damage">
     /// ダメージ値
     /// </param>
-    public void TakeDamageToPlayer(float damage) {
+    public void TakeDamageToPlayer() {
         if (target[0].AtkCountDown())
         {
             target[0].PlayAttackAnimation();
-            tmpHP -= damage;
+            tmpHP -= target[0].atkPower * damageCut;
+
+            if (damageCut <= 1F) damageCut = 1F;
         }
     }
 }

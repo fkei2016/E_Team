@@ -4,8 +4,12 @@ using UnityEngine;
 
 public class PlayerGroup : MonoBehaviour {
 
+    public float atkPower;
+
     [SerializeField]
     private GameObject[] prefabs;
+
+    private Player[] players;
 
     /// <summary>
     /// グループの作成
@@ -18,7 +22,7 @@ public class PlayerGroup : MonoBehaviour {
     /// </returns>
     public Player[] Create(int maxPlayerNum) {
         // ユーザーの配列を生成
-        var players = new Player[maxPlayerNum];
+        players = new Player[maxPlayerNum];
         // プレイヤーを個別に生成
         for (int i = 0; i < players.Length; i++)
         {

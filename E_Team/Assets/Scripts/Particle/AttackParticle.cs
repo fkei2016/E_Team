@@ -71,9 +71,6 @@ public class AttackParticle : MonoBehaviour {
     /// リストへ追加される
     /// </returns>
     public AttackParticle Emission(Vector2 size, GameObject shooter, GameObject target) {
-        //// ワールド座標（深度付き）への変換
-        //transform.position = Camera.main.ScreenToWorldPoint(screenPosition);
-        //transform.position = Vector3.forward * 80F;
         // 初期値の設定
         this.rectSize = size;
         this.shooter = shooter;
@@ -88,9 +85,9 @@ public class AttackParticle : MonoBehaviour {
         if (!moveFlag)
         {
             moveFlag = true;
-            var v2 = new Vector2(shooter.transform.position.x - rectSize.x * fourCorners[patrol].x,
-                shooter.transform.position.y + rectSize.y * fourCorners[patrol].y);
-            SetHash(v2, "ChangePatrol");
+            var x = shooter.transform.position.x - rectSize.x * fourCorners[patrol].x;
+            var y = shooter.transform.position.y + rectSize.y * fourCorners[patrol].y;
+            SetHash(new Vector2(x, y), "ChangePatrol");
         }
     }
 

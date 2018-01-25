@@ -14,7 +14,7 @@ public class GetMousePosition : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        var text = Input.mousePosition.ToString();
+        var text = Client.clickPosition.ToString();
         mousePositionText.text = text;
 	}
 }

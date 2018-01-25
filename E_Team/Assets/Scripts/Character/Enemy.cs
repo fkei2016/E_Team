@@ -5,10 +5,12 @@ using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour {
 
+    public float atkPower;
+
     [SerializeField]
     private int maxHp;
     [SerializeField]
-    private int maxAtk;
+    private int maxAtkCnt;
 
     private Animation anim;
     private Slider hp;
@@ -39,7 +41,7 @@ public class Enemy : MonoBehaviour {
     /// 攻撃カウントをリセット
     /// </summary>
     private void ResetATK() {
-        atk.text = (maxAtk).ToString();
+        atk.text = (maxAtkCnt).ToString();
     }
 
     /// <summary>

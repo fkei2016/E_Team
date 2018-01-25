@@ -38,9 +38,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     [SerializeField]
     private GameObject enemy;
     [SerializeField]
-    private List<AttackParticle> attackParticles;
-    [SerializeField]
     private GameObject effectPearent;
+    private List<AttackParticle> attackParticles;
 
 
     /// <summary>
@@ -59,6 +58,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
         // バトルの管理者と連携
         battle = BattleManager.instance;
+
+        attackParticles = new List<AttackParticle>();
     }
 
     /// <summary>
@@ -131,7 +132,6 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // ペア成立の処理
         if (turnFinish || pairCard.Count >= remainingCards)
         {
-            Debug.Log(completeNum);
             while (pairCard.Count > 0)
             {
                 // カードのフェードアウト
@@ -142,7 +142,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 if (--remainingCards % 2 == 0)
                 {
                     var waitTime = (completeNum < useCards.Length) ? 1F : 4F;
-                    StartCoroutine(battle.TakeDamageToEnemy(50F, waitTime));
+                    StartCoroutine(battle.TakeDamageToEnemy(waitTime));
                 }
                 // スキル上昇
                 battle.SkillUp(1F);
@@ -155,7 +155,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             turnFinish = false;
 
             // 敵の攻撃でプレイヤーにダメージを与える
-            battle.TakeDamageToPlayer(100F);
+            battle.TakeDamageToPlayer();
 
             // ターンの切り替え
             TurnChange(2.5F);
