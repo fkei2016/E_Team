@@ -76,11 +76,13 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         {
             if (activeUser.OnClick(Client.clickPosition))
             {
-                skill.Emission(activeUser.number, activeUser.transform.position + Vector3.down, 5F);
+                var particle = skill.Emission(activeUser.number, activeUser.transform.position + Vector3.down, 5F);
                 switch(activeUser.number)
                 {
                     case 0:
-
+                        var fire = particle.GetComponent<AttackParticle>().Emission(Vector2.zero, activeUser.gameObject, target[0].gameObject);
+                        fire.Attack(true);
+                        StartCoroutine(TakeDamageToEnemy(1F));
                         break;
                     case 1:
                         tmpHP += 100F;

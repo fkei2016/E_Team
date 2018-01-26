@@ -7,8 +7,10 @@ public class SkillParticle : MonoBehaviour {
     [SerializeField]
     private GameObject[] particles;
 
-    public void Emission(int useNumber, Vector2 position, float time) {
-        var particle = Instantiate(particles[useNumber], position, Quaternion.identity, transform);
+    public GameObject Emission(int useNumber, Vector2 position, float time) {
+        var original = particles[useNumber];
+        var particle = Instantiate(original, position, original.transform.rotation, transform);
         Destroy(particle, time);
+        return particle;
     }
 }

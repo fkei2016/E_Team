@@ -144,6 +144,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                     var waitTime = (completeNum < useCards.Length) ? 1F : 4F;
                     StartCoroutine(battle.TakeDamageToEnemy(waitTime));
                 }
+
                 // スキル上昇
                 battle.SkillUp(1F);
             }
@@ -184,6 +185,9 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // カードを積む
         pairCard.Push(card);
         completeNum++;
+
+        // スキル上昇
+        battle.SkillUp(1F);
 
         // ペアが組まれた場合
         if (pairCard.Count % 2 == 0)
