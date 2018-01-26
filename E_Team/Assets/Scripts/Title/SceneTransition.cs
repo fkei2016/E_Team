@@ -7,10 +7,26 @@ public class SceneTransition : MonoBehaviour {
     [SerializeField]
     private GameObject trigger;
 
+    private PhotonView view;
+
+    public void Start()
+    {
+        view = PhotonView.Get(this);
+    }
+
     private void Update() {
         if (trigger.activeSelf)
         {
-            GetComponent<JumpToScene>().Execute();
+            view.RPC("Execute", PhotonTargets.All);
         }
+    }
+
+    /// <summary>
+    /// シーン遷移の処理を共有します（山口追加）
+    /// </summary>
+    [PunRPC]
+    private void Execute()
+    {
+        GetComponent<JumpToScene>().Execute();
     }
 }

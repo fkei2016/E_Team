@@ -48,7 +48,8 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         turnNumber = 0;
 
         target = FindObjectsOfType<Enemy>();
-        users = playerGroup.Create(4);
+        var numbers = new int[] { 0, 1, 2 , 3};
+        users = playerGroup.Create(numbers.Length, numbers);
 
         // 指定の番号のみアクティブにする
         foreach (var user in users)
