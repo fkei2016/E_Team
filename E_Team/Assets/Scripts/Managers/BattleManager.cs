@@ -6,21 +6,21 @@ using UnityEngine.UI;
 public class BattleManager : SingletonMonoBehaviour<BattleManager> {
 
     [SerializeField]
-    private Slider playerHP;
-
-    [SerializeField]
     private PlayerGroup playerGroup;
 
     [SerializeField]
     private SkillParticle skill;
 
-    private float tmpHP;
-    private float damageSPD;
-    private int turnNumber;
+    [SerializeField]
+    private GameObject gameover;
+    [SerializeField]
+    private GameObject gameclear;
+
 
     private float damageCut = 1F;
     private float attackBonus = 1F;
 
+    private int turnNumber;
     private Enemy[] target;
     private Player[] users;
 
@@ -43,8 +43,6 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// 開始時に実行
     /// </summary>
     private void Start() {
-        tmpHP = playerHP.value;
-        damageSPD = 2.5F;
         turnNumber = 0;
 
         target = FindObjectsOfType<Enemy>();
@@ -63,15 +61,6 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// 更新時に実行
     /// </summary>
     private void Update() {
-        if(playerHP.value > tmpHP)
-        {
-            playerHP.value -= damageSPD;
-        }
-        else if(playerHP.value < tmpHP)
-        {
-            playerHP.value += damageSPD;
-        }
-
         if(Client.click)
         {
             if (activeUser.OnClick(Client.clickPosition))
@@ -85,7 +74,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
                         StartCoroutine(TakeDamageToEnemy(1F));
                         break;
                     case 1:
-                        tmpHP += 100F;
+                        playerGroup.ChangeHpValue(+100F);
                         break;
                     case 2:
                         attackBonus = 2F;
@@ -96,6 +85,20 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
                     default:
                         break;
                 }
+            }
+        }
+
+        // ゲームオーバー
+        gameover.SetActive(playerGroup.TakeDown());
+        // ゲームクリア
+        gameclear.SetActive(target[0].TakeDown());
+
+        // ゲームが終了した後はタイトルへ遷移
+        if(gameover.activeSelf || gameclear.activeSelf)
+        {
+            if(Client.click)
+            {
+                GetComponent<JumpToScene>().Execute();
             }
         }
     }
@@ -141,7 +144,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         yield return new WaitForSeconds(waitTime);
 
         // ダメージ計算とアニメーション
-        var takeDown = target[0].TakeDamage(playerGroup.atkPower * attackBonus);
+        target[0].TakeDamage(playerGroup.atkPower * attackBonus);
         //target.gameObject.SetActive(takeDown);
         target[0].PlayDamageAnimation();
 
@@ -159,7 +162,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         if (target[0].AtkCountDown())
         {
             target[0].PlayAttackAnimation();
-            tmpHP -= target[0].atkPower * damageCut;
+            playerGroup.ChangeHpValue(-target[0].atkPower * damageCut);
 
             if (damageCut <= 1F) damageCut = 1F;
         }
