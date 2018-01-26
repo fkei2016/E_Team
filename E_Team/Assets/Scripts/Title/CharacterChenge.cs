@@ -9,6 +9,8 @@ public class CharacterChenge : MonoBehaviour {
     private bool moveFlag = false;
 
     [SerializeField]
+    private GameObject trigger;
+    [SerializeField]
     private float width;
 
     /// <summary>
@@ -25,7 +27,7 @@ public class CharacterChenge : MonoBehaviour {
     /// 番号の移動数
     /// </param>
     public void AddCharacterNum(int num) {
-        if (!moveFlag)
+        if (!moveFlag && trigger.activeSelf)
         {
             moveFlag = true;
             characterNum += num;
