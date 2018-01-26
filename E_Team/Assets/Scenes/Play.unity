@@ -1550,7 +1550,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d35229514a3c0b4d88986ee89b991b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  atkPower: 450
+  atkPower: 250
   maxHp: 1000
   maxAtkCnt: 5
 --- !u!1 &1339527880
@@ -2770,7 +2770,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   particles:
-  - {fileID: 0}
+  - {fileID: 1539772204733720, guid: f452fb130af54024b8788e55e25d8c09, type: 2}
   - {fileID: 1420017518453804, guid: 8bae07477c771e646ab738d359becf38, type: 2}
   - {fileID: 1347372660677010, guid: 0b6d8748b8847ad40999225a5349323b, type: 2}
   - {fileID: 1347334862243396, guid: c51646fc4977c86489161ec830d4e3ff, type: 2}
