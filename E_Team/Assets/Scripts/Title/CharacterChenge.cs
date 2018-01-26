@@ -4,94 +4,71 @@ using UnityEngine;
 
 public class CharacterChenge : MonoBehaviour {
 
-    [SerializeField]
-    private GameObject[] characters;
-
-    private Vector3 afterpos;
-
-    [SerializeField]
     private int characterNum = 0;
 
-    [SerializeField]
     private bool moveFlag = false;
 
-    private float time = 1.0f;
+    [SerializeField]
+    private GameObject trigger;
+    [SerializeField]
+    private float width;
 
-    private float delTime = 0.0f;
-
-	// Use this for initialization
-	void Start () {
-
-        afterpos = characters[characterNum].transform.position;
-        var v1 = characters[0].transform.position;
-        var v2 = characters[1].transform.position;
-        var dir = v1 - v2;
-	}
-	
-	// Update is called once per frame
+    /// <summary>
+    /// 更新時に実行
+    /// </summary>
 	void Update () {
-
-        if (moveFlag)
-        {
-            delTime += Time.deltaTime;
-            if (delTime > 1.0f)
-            {
-                moveFlag = false;
-                delTime = 0.0f;
-            }
-        }
+        Client.characterNumber = characterNum % (transform.childCount);
     }
 
-    public void AddCharacterNum(int num)
-    {
-        if (!moveFlag)
+    /// <summary>
+    /// キャラクター番号の変更
+    /// </summary>
+    /// <param name="num">
+    /// 番号の移動数
+    /// </param>
+    public void AddCharacterNum(int num) {
+        if (!moveFlag && trigger.activeSelf)
         {
             moveFlag = true;
             characterNum += num;
-            CharacterMove(num);
-
-            Client.characterNumber = characterNum;
+            CharacterMove();
         }
     }
 
+    /// <summary>
+    /// キャラクターの移動処理
+    /// </summary>
+    void CharacterMove() {
+        // 範囲内にクランプ
+        characterNum = Mathf.Clamp(characterNum, 0, transform.childCount - 1);
+        // 番号分だけ移動
+        Move(-width * characterNum);
 
-    void CharacterMove(int num)
-    {
-
-        if (characterNum == characters.Length)
-        {
-            characterNum = characters.Length - 1;
-            return;
-        }
-        if (characterNum == -1)
-        {
-            characterNum = 0;
-            return;
-        }
-
-        for (int i = 0; i < characters.Length; i++)
-        {
-            if (num == 1)
-            {
-                Move(-1.58f, characters[i]);
-            }
-            else
-            {
-                Move(1.58f, characters[i]);
-            }
-        }
     }
 
-    void MoveEnd()
-    {
+    /// <summary>
+    /// 移動の終了
+    /// </summary>
+    void MoveEnd() {
+        // メゾット名で呼び出される
         moveFlag = false;
     }
 
-    void Move(float direction, GameObject obj, float time = 1F)
-    {
+    /// <summary>
+    ///  移動処理
+    /// </summary>
+    /// <param name="direction">
+    /// X軸移動量
+    /// </param>
+    /// <param name="time">
+    /// 移動時間
+    /// </param>
+    void Move(float direction,float time = 1F) {
         Hashtable table = new Hashtable();
         table.Add("x", direction);
         table.Add("time", time);
-        iTween.MoveBy(obj, table);
+        table.Add("islocal", true);
+        table.Add("oncomplete", "MoveEnd");
+        iTween.MoveTo(gameObject, table);
     }
 }

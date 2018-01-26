@@ -21,6 +21,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
     private bool turnFinish;
     private int keepPairNum;
+    private int completeNum;
     private Card[] useCards;
     private int remainingCards;
     private Stack<Card> pairCard;
@@ -37,14 +38,9 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     [SerializeField]
     private GameObject enemy;
     [SerializeField]
-    private List<AttackParticle> attackParticles;
-    [SerializeField]
     private GameObject effectPearent;
+    private List<AttackParticle> attackParticles;
 
-
-    //山口追加
-    private int[] usenum;
-    private PhotonView view;
 
     /// <summary>
     /// 開始時に処理
@@ -57,19 +53,13 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         generator = FindObjectOfType<CardGenerator>();
         spacement = FindObjectOfType<CardSpacement>();
 
-
         // カードの生成
-        if (PhotonNetwork.isMasterClient)
-            RemakeCards(false);
+        RemakeCards(false);
 
         // バトルの管理者と連携
         battle = BattleManager.instance;
 
-
-        //追加
-        NetworkManager.instance.photonview.ObservedComponents.Add(this);
-        view = PhotonView.Get(this);
-
+        attackParticles = new List<AttackParticle>();
     }
 
     /// <summary>
@@ -82,9 +72,10 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             Debug.Break();
         }
 
-        if (useCards == null)
+        // ペア数が変わったときに生成
+        if (keepPairNum != pairNum)
         {
-            RemakeCards(false);
+            RemakeCards();
         }
 
         // カード配置の再設定
@@ -130,9 +121,12 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         //}
 
         // アクティブユーザーのクリック処理
-        if (Client.click && battle.turnNumber + 1 == PhotonNetwork.player.ID)
+        if (Client.click)
         {
-            view.RPC("ShareOpenCard", PhotonTargets.All, Client.clickPosition);
+            foreach (var card in useCards)
+            {
+                card.OnClick(Client.clickPosition);
+            }
         }
 
         // ペア成立の処理
@@ -146,7 +140,10 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
                 //  ペアの数だけ敵にダメージを与える
                 if (--remainingCards % 2 == 0)
-                    battle.TakeDamageToEnemy(50F);
+                {
+                    var waitTime = (completeNum < useCards.Length) ? 1F : 4F;
+                    StartCoroutine(battle.TakeDamageToEnemy(waitTime));
+                }
                 // スキル上昇
                 battle.SkillUp(1F);
             }
@@ -158,10 +155,10 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             turnFinish = false;
 
             // 敵の攻撃でプレイヤーにダメージを与える
-            battle.TakeDamageToPlayer(100F);
+            battle.TakeDamageToPlayer();
 
             // ターンの切り替え
-            TurnChange();
+            TurnChange(2.5F);
         }
 
         // 全消しの検知
@@ -174,7 +171,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         if (!turnFinish && remainingCards <= 0)
         {
             RemakeCards();
-            TurnChange();
+            TurnChange(2F);
         }
     }
 
@@ -186,6 +183,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     public void SendCard(Card card) {
         // カードを積む
         pairCard.Push(card);
+        completeNum++;
 
         // ペアが組まれた場合
         if (pairCard.Count % 2 == 0)
@@ -206,6 +204,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 // カードを閉じる
                 StartCoroutine(card1.Close(1.5F));
                 StartCoroutine(card2.Close(1.5F));
+                completeNum--;
+                completeNum--;
             }
             else
             {
@@ -251,7 +251,6 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             {
                 Destroy(card.gameObject);
             }
-            usenum.Initialize();
         }
 
         // カードの再生成
@@ -259,17 +258,12 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // [Master]ペアリストの生成
         var list = generator.MakePairList(generator.maxDesign, useCards.Length);
         var array = new List<int>();
-
         for(int i = 0; i < useCards.Length; i++)
         {
             array.Add(generator.GetNonOverlappingValue(list));
         }
-
-        if(PhotonNetwork.isMasterClient)
-        usenum = array.ToArray();
-
         // カードに番号を割り振る
-        generator.AppendPairList(useCards, usenum);
+        generator.AppendPairList(useCards, array.ToArray());
         remainingCards = useCards.Length;
 
         // カード配置の生成と調整
@@ -278,13 +272,14 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
         // ターンを変更
         turnFinish = false;
+        completeNum = 0;
     }
 
     /// <summary>
     /// ターン切り替え
     /// </summary>
-    void TurnChange() {
-        battle.TurnChange();
+    void TurnChange(float waitTime = 1F) {
+        StartCoroutine(battle.TurnChange(waitTime));
         foreach (var effect in attackParticles)
         {
             effect.Attack(true);
@@ -309,37 +304,4 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         attack.Emission(card.size / Camera.main.farClipPlane, card.gameObject, enemy);
         attackParticles.Add(attack);
     }
-
-
-    /// <summary>
-    /// turnNumberをクライアント全員に共有します(山口追加)
-    /// </summary>
-    /// <param name="stream"></param>
-    /// <param name="info"></param>
-    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.isWriting)
-        {
-            //データの送信
-            stream.SendNext(usenum);
-        }
-        else
-        {
-            usenum = (int[])stream.ReceiveNext();
-        }
-    }
-
-    /// <summary>
-    /// カードを開く処理をクライアント全員に実行させます(山口追加)
-    /// </summary>
-    /// <param name="_touchposition"></param>
-    [PunRPC]
-    void ShareOpenCard(Vector3 _touchposition)
-    {
-        foreach (var card in useCards)
-        {
-            card.OnClick(Client.clickPosition);
-        }
-    }
-
 }

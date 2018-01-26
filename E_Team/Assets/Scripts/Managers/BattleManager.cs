@@ -11,16 +11,18 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     [SerializeField]
     private PlayerGroup playerGroup;
 
+    [SerializeField]
+    private SkillParticle skill;
+
     private float tmpHP;
     private float damageSPD;
-    public int turnNumber;//publibに変更しました（山口追加）
+    private int turnNumber;
+
+    private float damageCut = 1F;
+    private float attackBonus = 1F;
 
     private Enemy[] target;
     private Player[] users;
-
-    //山口追加
-    private PhotonView view;
-    public GameObject mask;
 
     public Player activeUser
     {
@@ -28,7 +30,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         {
             foreach(var user in users)
             {
-                if(!user.active)
+                if(user.active)
                 {
                     return user;
                 }
@@ -46,32 +48,53 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         turnNumber = 0;
 
         target = FindObjectsOfType<Enemy>();
-        users = playerGroup.Create(4);
-        foreach(var user in users)
+        var numbers = new int[] { 0, 1, 2 , 3};
+        users = playerGroup.Create(numbers.Length, numbers);
+
+        // 指定の番号のみアクティブにする
+        foreach (var user in users)
         {
-            user.active = false;
+            user.active = true;
         }
-
-        //// 指定の番号のみアクティブにする
-        //foreach (var user in users)
-        //{
-        //    user.active = true;
-        //}
-        //users[turnNumber].active = false;
-
-        //山口追加
-        view = PhotonView.Get(this);
-        NetworkManager.instance.photonview.ObservedComponents.Add(this);
-        mask.active = !(turnNumber + 1 == PhotonNetwork.player.ID);
+        users[turnNumber].active = false;
     }
 
     /// <summary>
     /// 更新時に実行
     /// </summary>
     private void Update() {
-        if(playerHP.value >= tmpHP)
+        if(playerHP.value > tmpHP)
         {
             playerHP.value -= damageSPD;
+        }
+        else if(playerHP.value < tmpHP)
+        {
+            playerHP.value += damageSPD;
+        }
+
+        if(Client.click)
+        {
+            if (activeUser.OnClick(Client.clickPosition))
+            {
+                skill.Emission(activeUser.number, activeUser.transform.position + Vector3.down, 5F);
+                switch(activeUser.number)
+                {
+                    case 0:
+
+                        break;
+                    case 1:
+                        tmpHP += 100F;
+                        break;
+                    case 2:
+                        attackBonus = 2F;
+                        break;
+                    case 3:
+                        damageCut = 0.5F;
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
     }
 
@@ -85,23 +108,20 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         activeUser.SkillUp(upper);
     }
 
-
-    //↓タッチ終了時に実行
     /// <summary>
     /// ターン切り替え
     /// </summary>
-    public void TurnChange() {
+    public IEnumerator TurnChange(float waitTime = 1F) {
+        yield return new WaitForSeconds(waitTime);
 
         // ターン番号を更新
-        if (++turnNumber >= users.Length)
+        if(++turnNumber >= users.Length)
         {
             turnNumber = 0;
         }
 
-        mask.active = !(turnNumber + 1 == PhotonNetwork.player.ID);
-
         // 指定の番号のみアクティブにする
-        foreach (var user in users)
+        foreach(var user in users)
         {
             user.active = true;
         }
@@ -111,11 +131,20 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// <summary>
     /// 敵にダメージを与える
     /// </summary>
-    /// <param name="damage"></param>
-    public void TakeDamageToEnemy(float damage) {
-        var takeDown = target[0].TakeDamage(damage);
+    /// <param name="damage">
+    /// ダメージ量
+    /// </param>
+    public IEnumerator TakeDamageToEnemy(float waitTime = 1F) {
+        // 遅延演出
+        yield return new WaitForSeconds(waitTime);
+
+        // ダメージ計算とアニメーション
+        var takeDown = target[0].TakeDamage(playerGroup.atkPower * attackBonus);
         //target.gameObject.SetActive(takeDown);
         target[0].PlayDamageAnimation();
+
+        // 攻撃力向上の解除
+        if (attackBonus >= 1F) attackBonus = 1F;
     }
 
     /// <summary>
@@ -124,31 +153,13 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// <param name="damage">
     /// ダメージ値
     /// </param>
-    public void TakeDamageToPlayer(float damage) {
+    public void TakeDamageToPlayer() {
         if (target[0].AtkCountDown())
         {
             target[0].PlayAttackAnimation();
-            tmpHP -= damage;
+            tmpHP -= target[0].atkPower * damageCut;
+
+            if (damageCut <= 1F) damageCut = 1F;
         }
     }
-
-    /// <summary>
-    /// turnNumberをクライアント全員に共有します(山口追加)
-    /// </summary>
-    /// <param name="stream"></param>
-    /// <param name="info"></param>
-    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-        if (stream.isWriting)
-        {
-            //データの送信
-            stream.SendNext(turnNumber);
-        }
-        else
-        {
-            //データの受信
-            this.turnNumber = (int)stream.ReceiveNext();
-        }
-    }
-
 }

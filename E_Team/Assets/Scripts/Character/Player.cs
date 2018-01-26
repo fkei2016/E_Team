@@ -4,14 +4,14 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class Player : MonoBehaviour {
-
     [HideInInspector]
     public int number;
 
     private Image skill;
     private GameObject mask;
 
-    private float skillTmp;
+    [SerializeField, Range(0, 1)]
+    private float skillTmp = 0F;
 
     private float skillGauge
     {
@@ -20,25 +20,23 @@ public class Player : MonoBehaviour {
     }
     public bool active
     {
-        get { return mask.activeSelf; }
+        get { return !mask.activeSelf; }
         set { mask.SetActive(value); }
+    }
+
+    /// <summary>
+    /// 生成時に実行
+    /// </summary>
+	void Awake () {
+        skill = transform.GetChild(1).GetComponent<Image>();
+        mask = transform.GetChild(3).gameObject;
     }
 
     /// <summary>
     /// 開始時に実行
     /// </summary>
-	void Awake () {
-        skill = transform.GetChild(1).GetComponent<Image>();
-        mask = transform.GetChild(3).gameObject;
-
-        // クリックでスキル発動処理の実行
-        gameObject.AddEventTrigger(UnityEngine.EventSystems.EventTriggerType.PointerUp,
-            data =>{ SkillActivation(); });
-
-        skillGauge = 0F;
-        skillTmp = 0F;
-
-        number = PhotonNetwork.player.ID;
+    private void Start() {
+        skillGauge = skillTmp;
     }
 
     /// <summary>
@@ -66,17 +64,23 @@ public class Player : MonoBehaviour {
     }
 
     /// <summary>
-    /// スキル発動
+    /// クリック処理
     /// </summary>
-    public void SkillActivation() {
-        if (active && skillGauge >= 1F)
+    /// <param name="position">
+    /// クリック座標
+    /// </param>
+    public bool OnClick(Vector3 position) {
+        var worldPosition = Camera.main.WorldToScreenPoint(transform.position);
+        var size = GetComponent<RectTransform>().sizeDelta;
+
+        // 矩形とクリック座標の交点で判定
+        Rect rect = new Rect(worldPosition.x - size.x / 2, worldPosition.y - size.y / 2, size.x, size.y);
+        if (rect.Contains(position) && skillGauge >= 1F)
         {
+            // 値を初期化
             skillTmp = 0F;
-            Debug.Log("Use Skill !!");
+            return true;
         }
-        else
-        {
-            Debug.Log("Dont use Skill...");
-        }
+        return false;
     }
 }
