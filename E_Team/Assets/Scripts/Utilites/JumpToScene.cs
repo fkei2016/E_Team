@@ -13,6 +13,6 @@ public class JumpToScene : MonoBehaviour {
     /// シーン遷移の実行
     /// </summary>
     public void Execute() {
-        SceneManager.LoadScene(sceneName);
+        PhotonNetwork.LoadLevel(sceneName);
     }
 }

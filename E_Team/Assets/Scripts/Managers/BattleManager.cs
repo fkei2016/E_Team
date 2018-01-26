@@ -13,10 +13,14 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
 
     private float tmpHP;
     private float damageSPD;
-    private int turnNumber;
+    public int turnNumber;//publibに変更しました（山口追加）
 
     private Enemy[] target;
     private Player[] users;
+
+    //山口追加
+    private PhotonView view;
+    public GameObject mask;
 
     public Player activeUser
     {
@@ -54,6 +58,11 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         //    user.active = true;
         //}
         //users[turnNumber].active = false;
+
+        //山口追加
+        view = PhotonView.Get(this);
+        NetworkManager.instance.photonview.ObservedComponents.Add(this);
+        mask.active = !(turnNumber + 1 == PhotonNetwork.player.ID);
     }
 
     /// <summary>
@@ -76,18 +85,23 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         activeUser.SkillUp(upper);
     }
 
+
+    //↓タッチ終了時に実行
     /// <summary>
     /// ターン切り替え
     /// </summary>
     public void TurnChange() {
+
         // ターン番号を更新
-        if(++turnNumber >= users.Length)
+        if (++turnNumber >= users.Length)
         {
             turnNumber = 0;
         }
 
+        mask.active = !(turnNumber + 1 == PhotonNetwork.player.ID);
+
         // 指定の番号のみアクティブにする
-        foreach(var user in users)
+        foreach (var user in users)
         {
             user.active = true;
         }
@@ -117,4 +131,24 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
             tmpHP -= damage;
         }
     }
+
+    /// <summary>
+    /// turnNumberをクライアント全員に共有します(山口追加)
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <param name="info"></param>
+    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.isWriting)
+        {
+            //データの送信
+            stream.SendNext(turnNumber);
+        }
+        else
+        {
+            //データの受信
+            this.turnNumber = (int)stream.ReceiveNext();
+        }
+    }
+
 }

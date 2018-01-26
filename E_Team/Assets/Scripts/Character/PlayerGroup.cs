@@ -16,7 +16,7 @@ public class PlayerGroup : MonoBehaviour {
     /// <returns>
     /// ユーザーの配列
     /// </returns>
-    public Player[] Create(int maxPlayerNum) {
+    public Player[] Create(int maxPlayerNum/*,int[] _players*/) {
         // ユーザーの配列を生成
         var players = new Player[maxPlayerNum];
         // プレイヤーを個別に生成

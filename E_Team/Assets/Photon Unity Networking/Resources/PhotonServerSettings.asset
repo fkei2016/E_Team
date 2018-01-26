@@ -48,4 +48,11 @@ MonoBehaviour:
   - GetNums
   - GetValue
   - getcard
+  - Order
+  - ShareCard
+  - shareusecard
+  - turnchange
+  - onclick
+  - ShareOpenCard
+  - Execute
   DisableAutoOpenWizard: 1
