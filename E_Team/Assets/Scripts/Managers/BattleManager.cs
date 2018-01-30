@@ -20,7 +20,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     private float damageCut = 1F;
     private float attackBonus = 1F;
 
-    private int turnNumber;
+    public int turnNumber;//publibに変更しました（山口追加）
     private Enemy[] target;
     private Player[] users;
 
@@ -39,6 +39,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         }
     }
 
+
     /// <summary>
     /// 開始時に実行
     /// </summary>
@@ -55,6 +56,9 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
             user.active = true;
         }
         users[turnNumber].active = false;
+
+        //山口追加
+        NetworkManager.instance.photonview.ObservedComponents.Add(this);
     }
 
     /// <summary>
@@ -167,4 +171,25 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
             if (damageCut <= 1F) damageCut = 1F;
         }
     }
+
+    /// <summary>
+    /// turnNumberをクライアント全員に共有します(山口追加)
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <param name="info"></param>
+    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.isWriting)
+        {
+            //データの送信
+            stream.SendNext(turnNumber);
+        }
+        else
+        {
+            //データの受信
+            this.turnNumber = (int)stream.ReceiveNext();
+        }
+    }
+
+
 }
