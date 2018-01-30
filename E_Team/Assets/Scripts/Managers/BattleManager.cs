@@ -16,13 +16,15 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
 
     private float tmpHP;
     private float damageSPD;
-    private int turnNumber;
+    public int turnNumber;//publibに変更しました（山口追加）
 
     private float damageCut = 1F;
     private float attackBonus = 1F;
 
     private Enemy[] target;
     private Player[] users;
+
+    public Text tex;
 
     public Player activeUser
     {
@@ -38,6 +40,11 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
             return null;
         }
     }
+    
+    //追加分---
+    public GameObject mask;
+    //---------
+
 
     /// <summary>
     /// 開始時に実行
@@ -48,8 +55,16 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         turnNumber = 0;
 
         target = FindObjectsOfType<Enemy>();
-        var numbers = new int[] { 0, 1, 2 , 3};
-        users = playerGroup.Create(numbers.Length, numbers);
+        var numbers = new int[] { 0, 1, 2, 3 };//プレイヤー不足分のキャラクター用
+
+        //山口追加(2018/01/26)
+        for (var i=0;i<PhotonNetwork.playerList.Length;i++)
+        {
+            numbers[i] = TakeOverClient.clientnums[i];//クライアント数分のキャラクター更新(デフォルトは0番)
+        }
+
+        //users = playerGroup.Create(numbers.Length, numbers);
+        users = playerGroup.Create(PhotonNetwork.playerList.Length, numbers);
 
         // 指定の番号のみアクティブにする
         foreach (var user in users)
@@ -57,12 +72,19 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
             user.active = true;
         }
         users[turnNumber].active = false;
+
+
+        //山口追加
+        NetworkManager.instance.photonview.ObservedComponents.Add(this);
+        mask.active = !(turnNumber + 1 == PhotonNetwork.player.ID);
+
     }
 
     /// <summary>
     /// 更新時に実行
     /// </summary>
     private void Update() {
+
         if(playerHP.value > tmpHP)
         {
             playerHP.value -= damageSPD;
@@ -122,12 +144,17 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
             turnNumber = 0;
         }
 
+        //追加
+        mask.active = !(turnNumber + 1 == PhotonNetwork.player.ID);
+
+
         // 指定の番号のみアクティブにする
         foreach(var user in users)
         {
             user.active = true;
         }
         users[turnNumber].active = false;
+
     }
 
     /// <summary>
@@ -164,4 +191,26 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
             if (damageCut <= 1F) damageCut = 1F;
         }
     }
+
+    /// <summary>
+    /// turnNumberをクライアント全員に共有します(山口追加)
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <param name="info"></param>
+    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.isWriting)
+        {
+            //データの送信
+            stream.SendNext(turnNumber);
+        }
+        else
+        {
+            //データの受信
+            this.turnNumber = (int)stream.ReceiveNext();
+            tex.text = turnNumber.ToString();
+        }
+    }
+
+
 }

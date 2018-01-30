@@ -55,4 +55,5 @@ MonoBehaviour:
   - onclick
   - ShareOpenCard
   - Execute
+  - changeclientnum
   DisableAutoOpenWizard: 1

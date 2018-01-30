@@ -13,6 +13,9 @@ public class CharacterChenge : MonoBehaviour {
     [SerializeField]
     private float width;
 
+    [SerializeField]
+    private TakeOverClient takeoverclient;
+
     /// <summary>
     /// 更新時に実行
     /// </summary>
@@ -52,6 +55,9 @@ public class CharacterChenge : MonoBehaviour {
     void MoveEnd() {
         // メゾット名で呼び出される
         moveFlag = false;
+
+        takeoverclient.ChangeClientNum(PhotonNetwork.player.ID - 1, Client.characterNumber);
+        //TakeOverClient.clientnums[PhotonNetwork.player.ID - 1] = Client.characterNumber;
     }
 
     /// <summary>
