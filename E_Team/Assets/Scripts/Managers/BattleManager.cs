@@ -73,17 +73,25 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
                 switch(activeUser.number)
                 {
                     case 0:
+                        //音追加
+                        AudioManager.instance.PlaySE("SkillAttackSE");
                         var fire = particle.GetComponent<AttackParticle>().Emission(Vector2.zero, activeUser.gameObject, target[0].gameObject);
                         fire.Attack(true);
                         StartCoroutine(TakeDamageToEnemy(1F));
                         break;
                     case 1:
+                        //音追加
+                        AudioManager.instance.PlaySE("HeelSE");
                         playerGroup.ChangeHpValue(+100F);
                         break;
                     case 2:
+                        //音追加
+                        AudioManager.instance.PlaySE("AttackBufSE");
                         attackBonus = 2F;
                         break;
                     case 3:
+                        //音追加
+                        AudioManager.instance.PlaySE("DefBufSE");
                         damageCut = 0.5F;
                         break;
                     default:
@@ -147,6 +155,9 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         // 遅延演出
         yield return new WaitForSeconds(waitTime);
 
+        //音追加
+        AudioManager.instance.PlaySE("PlayerAttackSE");
+
         // ダメージ計算とアニメーション
         target[0].TakeDamage(playerGroup.atkPower * attackBonus);
         //target.gameObject.SetActive(takeDown);
@@ -165,6 +176,10 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     public void TakeDamageToPlayer() {
         if (target[0].AtkCountDown())
         {
+
+            //音追加
+            AudioManager.instance.PlaySE("EnemyAttackSE");
+
             target[0].PlayAttackAnimation();
             playerGroup.ChangeHpValue(-target[0].atkPower * damageCut);
 

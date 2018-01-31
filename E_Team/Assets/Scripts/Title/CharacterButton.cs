@@ -22,6 +22,7 @@ public class CharacterButton : MonoBehaviour {
 
     public void OnPushButton()
     {
+        AudioManager.instance.PlaySE("SelectSE");
         characterChenge.AddCharacterNum(num);
     }
 }

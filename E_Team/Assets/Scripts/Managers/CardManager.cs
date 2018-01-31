@@ -124,21 +124,21 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             useCards[i].transform.position = Vector3.MoveTowards(useCards[i].transform.position, cardPositions[i], Time.deltaTime * 100F);
         }
 
-        //// [Debug]シングルプレイテスト用
-        //if (Input.GetMouseButtonDown(0) && !cardMask.gameObject.activeSelf)
-        //{
-        //    foreach (var card in useCards)
-        //    {
-        //        if(card.gameObject.activeSelf)
-        //        card.OnClick(Input.mousePosition);
-        //    }
-        //}
+        // [Debug]シングルプレイテスト用
+        if (Input.GetMouseButtonDown(0) && !cardMask.gameObject.activeSelf)
+        {
+            foreach (var card in useCards)
+            {
+                if (card.gameObject.activeSelf)
+                    card.OnClick(Input.mousePosition);
+            }
+        }
 
         // アクティブユーザーのクリック処理
-        if (Client.click && battle.turnNumber + 1 == PhotonNetwork.player.ID)
-        {
-            view.RPC("ShareOpenCard", PhotonTargets.All, Client.clickPosition);
-        }
+        //if (Client.click && battle.turnNumber + 1 == PhotonNetwork.player.ID)
+        //{
+        //    view.RPC("ShareOpenCard", PhotonTargets.All, Client.clickPosition);
+        //}
 
         // ペア成立の処理
         if (turnFinish || pairCard.Count >= remainingCards)
@@ -216,6 +216,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 var missFX = GetComponent<MissEffect>();
                 StartCoroutine(missFX.Emission(card1.transform));
                 StartCoroutine(missFX.Emission(card2.transform));
+                //音追加
+                AudioManager.instance.PlaySE("MissSE");
                 // カードを閉じる
                 StartCoroutine(card1.Close(1.5F));
                 StartCoroutine(card2.Close(1.5F));
@@ -227,6 +229,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 // ペアパーティクルの発生
                 PairParticle(card1, GetComponent<TouchCombo>());
                 PairParticle(card2, GetComponent<TouchCombo>());
+                //音追加
+                AudioManager.instance.PlaySE("PearSE");
                 // ペアカードを積む
                 pairCard.Push(card1);
                 pairCard.Push(card2);
