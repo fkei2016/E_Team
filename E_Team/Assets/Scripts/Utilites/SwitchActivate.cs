@@ -11,6 +11,8 @@ public class SwitchActivate : MonoBehaviour {
 
 
     public void Execution() {
+        //押されたら音を鳴らす
+        AudioManager.instance.PlaySE("DecisionSE");
         if(++keepNumber >= objects.Length)
         {
             keepNumber = 0;
