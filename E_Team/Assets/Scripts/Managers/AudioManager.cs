@@ -4,6 +4,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using AudioIndex = System.Collections.Generic.Dictionary<string, int>;
+
 public class AudioManager : SingletonMonoBehaviour<AudioManager> {
 
     [SerializeField]
@@ -11,8 +13,8 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager> {
     [SerializeField]
     private AudioClip[] seClips;
 
-    private Dictionary<string, int> bgmIndex;
-    private Dictionary<string, int> seIndex;
+    private AudioIndex bgmIndex;
+    private AudioIndex seIndex;
 
     private AudioSource bgmPlayer;
     private AudioSource sePlayer;
@@ -21,6 +23,7 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager> {
     /// 生成時に実行
     /// </summary>
     protected override void Awake() {
+        // シングルトン
         base.Awake();
 
         // BGMのオーディオを生成
@@ -33,10 +36,14 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager> {
     }
 
     /// <summary>
-    /// オーディオソースの設定
+    /// オーディオソースの生成
     /// </summary>
-    /// <param name="loop"></param>
-    /// <returns></returns>
+    /// <param name="loop">
+    /// 繰り返し
+    /// </param>
+    /// <returns>
+    /// オーディオソース
+    /// </returns>
     AudioSource CreateAudioPlayer(bool loop = false) {
         var audio = gameObject.AddComponent<AudioSource>();
         audio.loop = loop;
@@ -44,12 +51,16 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager> {
     }
 
     /// <summary>
-    /// オーディオインデックスの設定
+    /// オーディオ番号の設定
     /// </summary>
-    /// <param name="clips"></param>
-    /// <returns></returns>
-    Dictionary<string, int> MakeAudioIndex(AudioClip[] clips) {
-        var index = new Dictionary<string, int>();
+    /// <param name="clips">
+    /// オーディオの配列
+    /// </param>
+    /// <returns>
+    /// オーディオ番号
+    /// </returns>
+    AudioIndex MakeAudioIndex(AudioClip[] clips) {
+        var index = new AudioIndex();
         for(int i = 0; i < clips.Length; i++)
         {
             index.Add(clips[i].name, i);
@@ -60,10 +71,20 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager> {
     /// <summary>
     /// BGMの再生
     /// </summary>
-    /// <param name="soundName"></param>
+    /// <param name="soundName">
+    /// オーディオ名
+    /// </param>
     public void PlayBGM(string soundName) {
-        // 名前からループ再生を行う
-        var index = bgmIndex[soundName];
+        PlayBGM(bgmIndex[soundName]);
+    }
+
+    /// <summary>
+    /// BGMの再生
+    /// </summary>
+    /// <param name="index">
+    /// オーディオ番号
+    /// </param>
+    public void PlayBGM(int index) {
         bgmPlayer.clip = bgmClips[index];
         bgmPlayer.Play();
     }
@@ -71,10 +92,20 @@ public class AudioManager : SingletonMonoBehaviour<AudioManager> {
     /// <summary>
     /// SEの再生
     /// </summary>
-    /// <param name="soundName"></param>
+    /// <param name="soundName">
+    /// オーディオ名
+    /// </param>
     public void PlaySE(string soundName) {
-        // 名前から単一再生を行う
-        var index = seIndex[soundName];
+        PlaySE(seIndex[soundName]);
+    }
+
+    /// <summary>
+    /// SEの再生
+    /// </summary>
+    /// <param name="index">
+    /// おーひど番号
+    /// </param>
+    public void PlaySE(int index) {
         sePlayer.PlayOneShot(seClips[index]);
     }
 }

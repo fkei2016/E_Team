@@ -32,6 +32,7 @@ public class CharacterChenge : MonoBehaviour {
     public void AddCharacterNum(int num) {
         if (!moveFlag && trigger.activeSelf)
         {
+            AudioManager.instance.PlaySE("SelectSE");
             moveFlag = true;
             characterNum += num;
             CharacterMove();
