@@ -47,8 +47,8 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         turnNumber = 0;
 
         target = FindObjectsOfType<Enemy>();
-        var numbers = new int[] { 0, 1, 2 , 3};
-        users = playerGroup.Create(numbers.Length, numbers);
+        var numbers = TakeOverClient.clientnums;
+        users = playerGroup.Create(PhotonNetwork.playerList.Length, numbers);//第一引数を変更しました(numbers.length →　Photonnetwork.Playerlist.Length)
 
         // 指定の番号のみアクティブにする
         foreach (var user in users)
