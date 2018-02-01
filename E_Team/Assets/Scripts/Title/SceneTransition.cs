@@ -15,6 +15,9 @@ public class SceneTransition : MonoBehaviour {
     }
 
     private void Update() {
+        if (!PhotonNetwork.isMasterClient)
+            return;
+
         if (trigger.activeSelf)
         {
             view.RPC("Execute", PhotonTargets.All);
@@ -27,6 +30,8 @@ public class SceneTransition : MonoBehaviour {
     [PunRPC]
     private void Execute()
     {
+
+
         GetComponent<JumpToScene>().Execute();
     }
 }

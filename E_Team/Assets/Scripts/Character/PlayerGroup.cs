@@ -35,7 +35,7 @@ public class PlayerGroup : MonoBehaviour {
         // ユーザーの配列を生成
         players = new Player[maxPlayerNum];
         // プレイヤーを個別に生成
-        for (int i = 0; i < players.Length; i++)
+        for (int i = 0; i < PhotonNetwork.playerList.Length; i++)
         {
             var player = Instantiate(prefabs[numbers[i]]);
             players[i] = player.gameObject.AttachComponet<Player>();
@@ -64,7 +64,6 @@ public class PlayerGroup : MonoBehaviour {
     public bool TakeDown() {
         return (hpBar.value <= 0F);
     }
-
 
     /// <summary>
     /// 開始時に実行
