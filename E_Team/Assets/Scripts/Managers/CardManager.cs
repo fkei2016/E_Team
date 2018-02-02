@@ -332,9 +332,26 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // コンボ発生
         StartCoroutine(combo.Emission(card.transform));
         // 攻撃エフェクト発生
+        StartCoroutine(AttackEmission(card.size / Camera.main.farClipPlane, card.gameObject));
+    }
+
+    /// <summary>
+    /// 攻撃エフェクトの発生
+    /// </summary>
+    /// <param name="size">
+    /// カードのサイズ
+    /// </param>
+    /// <param name="gameobject">
+    /// ゲームオブジェクト
+    /// </param>
+    /// <returns>
+    /// コルーチン
+    /// </returns>
+    private IEnumerator AttackEmission(Vector2 size, GameObject gameobject) {
+        yield return new WaitForSeconds(1F);
         var fx = Instantiate(attackEffeckPrefab, effectPearent.transform);
         var attack = fx.GetComponent<AttackParticle>();
-        attack.Emission(card.size / Camera.main.farClipPlane, card.gameObject, enemy);
+        attack.Emission(size, gameObject, enemy);
         attackParticles.Add(attack);
     }
 
