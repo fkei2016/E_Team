@@ -22,6 +22,10 @@ public class MissEffect : MonoBehaviour {
         var obj = Instantiate(FadeText);
         obj.transform.Reset(target);
 
+        // 効果音の再生
+        var audio = AudioManager.instance;
+        if (audio) audio.PlaySE("MissSE");
+
         // エフェクトとして消滅
         yield return new WaitForSeconds(1F);
         Destroy(obj);

@@ -39,5 +39,10 @@ public class TouchCombo : MonoBehaviour
         gen.TargetCanvas = target.gameObject;
         gen.PopupTextObject = this.PopupText;
         gen.Popup();
+
+
+        //音追加
+        var audio = AudioManager.instance;
+        if (audio) audio.PlaySE("PearSE");
     }
 }

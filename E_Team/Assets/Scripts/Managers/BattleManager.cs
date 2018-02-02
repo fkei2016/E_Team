@@ -46,8 +46,12 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     private void Start() {
         turnNumber = 0;
 
+        // 仮り組み用の敵を検索
         target = FindObjectsOfType<Enemy>();
+
+        // プレイヤーの生成
         var numbers = TakeOverClient.clientnums;
+        if (numbers == null) numbers = new int[] { 0 };
         users = playerGroup.Create(PhotonNetwork.playerList.Length, numbers);//第一引数を変更しました(numbers.length →　Photonnetwork.Playerlist.Length)
 
         // 指定の番号のみアクティブにする
@@ -58,7 +62,8 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         users[turnNumber].active = false;
 
         //山口追加
-        NetworkManager.instance.photonview.ObservedComponents.Add(this);
+        var nMng = NetworkManager.instance;
+        if(nMng) nMng.photonview.ObservedComponents.Add(this);
     }
 
     /// <summary>

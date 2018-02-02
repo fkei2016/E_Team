@@ -66,8 +66,12 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         attackParticles = new List<AttackParticle>();
 
         //追加
-        NetworkManager.instance.photonview.ObservedComponents.Add(this);
-        view = PhotonView.Get(this);
+        var nMng = NetworkManager.instance;
+        if (nMng)
+        {
+            nMng.photonview.ObservedComponents.Add(this);
+            view = PhotonView.Get(this);
+        }
     }
 
     /// <summary>
@@ -216,8 +220,6 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 var missFX = GetComponent<MissEffect>();
                 StartCoroutine(missFX.Emission(card1.transform));
                 StartCoroutine(missFX.Emission(card2.transform));
-                //音追加
-                AudioManager.instance.PlaySE("MissSE");
                 // カードを閉じる
                 StartCoroutine(card1.Close(1.5F));
                 StartCoroutine(card2.Close(1.5F));
@@ -229,8 +231,6 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 // ペアパーティクルの発生
                 PairParticle(card1, GetComponent<TouchCombo>());
                 PairParticle(card2, GetComponent<TouchCombo>());
-                //音追加
-                AudioManager.instance.PlaySE("PearSE");
                 // ペアカードを積む
                 pairCard.Push(card1);
                 pairCard.Push(card2);
@@ -284,8 +284,15 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         }
 
         //追加
-        if (PhotonNetwork.isMasterClient)
+        if(!PhotonNetwork.connecting)
+        {
             usenum = array.ToArray();
+        }
+        else
+        {
+            if (PhotonNetwork.isMasterClient)
+                usenum = array.ToArray();
+        }
 
 
         // カードに番号を割り振る

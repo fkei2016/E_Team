@@ -9,10 +9,15 @@ public class SwitchActivate : MonoBehaviour {
 
     int keepNumber = 0;
 
+    AudioManager audio;
+
+    private void Start() {
+        audio = AudioManager.instance;
+    }
 
     public void Execution() {
         //押されたら音を鳴らす
-        AudioManager.instance.PlaySE("DecisionSE");
+        if(audio) audio.PlaySE("DecisionSE");
         if(++keepNumber >= objects.Length)
         {
             keepNumber = 0;
