@@ -35,9 +35,10 @@ public class PlayerGroup : MonoBehaviour {
         // ユーザーの配列を生成
         players = new Player[maxPlayerNum];
         // プレイヤーを個別に生成
-        for (int i = 0; i < PhotonNetwork.playerList.Length; i++)
+        for (int i = 0; i < players.Length; i++)
         {
-            var player = Instantiate(prefabs[numbers[i]]);
+            var prefab = prefabs[numbers[i]];
+            var player = Instantiate(prefab);
             players[i] = player.gameObject.AttachComponet<Player>();
             players[i].number = numbers[i];
             players[i].transform.Reset(transform);

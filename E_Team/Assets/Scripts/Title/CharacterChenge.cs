@@ -16,11 +16,15 @@ public class CharacterChenge : MonoBehaviour {
     [SerializeField]
     private TakeOverClient takeoverclient;
 
+    private AudioManager audio;
+
     /// <summary>
     /// 更新時に実行
     /// </summary>
 	void Update () {
         Client.characterNumber = characterNum % (transform.childCount);
+
+        audio = AudioManager.instance;
     }
 
     /// <summary>
@@ -32,7 +36,7 @@ public class CharacterChenge : MonoBehaviour {
     public void AddCharacterNum(int num) {
         if (!moveFlag && trigger.activeSelf)
         {
-            AudioManager.instance.PlaySE("SelectSE");
+            if(audio) audio.PlaySE("SelectSE");
             moveFlag = true;
             characterNum += num;
             CharacterMove();
