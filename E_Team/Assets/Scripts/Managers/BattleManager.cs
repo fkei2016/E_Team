@@ -24,6 +24,8 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     private Enemy[] target;
     private Player[] users;
 
+    private PhotonView view;
+
     public Player activeUser
     {
         get
@@ -62,8 +64,8 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         users[turnNumber].active = false;
 
         //山口追加
-        var nMng = NetworkManager.instance;
-        if(nMng) nMng.photonview.ObservedComponents.Add(this);
+        view = PhotonView.Get(this);
+        NetworkManager.instance.photonview.ObservedComponents.Add(this);
     }
 
     /// <summary>
@@ -74,34 +76,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         {
             if (activeUser.OnClick(Client.clickPosition))
             {
-                var particle = skill.Emission(activeUser.number, activeUser.transform.position + Vector3.down, 5F);
-                switch(activeUser.number)
-                {
-                    case 0:
-                        //音追加
-                        AudioManager.instance.PlaySE("SkillAttackSE");
-                        var fire = particle.GetComponent<AttackParticle>().Emission(Vector2.zero, activeUser.gameObject, target[0].gameObject);
-                        fire.Attack(true);
-                        StartCoroutine(TakeDamageToEnemy(1F));
-                        break;
-                    case 1:
-                        //音追加
-                        AudioManager.instance.PlaySE("HeelSE");
-                        playerGroup.ChangeHpValue(+100F);
-                        break;
-                    case 2:
-                        //音追加
-                        AudioManager.instance.PlaySE("AttackBufSE");
-                        attackBonus = 2F;
-                        break;
-                    case 3:
-                        //音追加
-                        AudioManager.instance.PlaySE("DefBufSE");
-                        damageCut = 0.5F;
-                        break;
-                    default:
-                        break;
-                }
+                view.RPC("UseSkill", PhotonTargets.AllViaServer);
             }
         }
 
@@ -211,5 +186,38 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         }
     }
 
+    [PunRPC]
+    void UseSkill()
+    {
+        var particle = skill.Emission(activeUser.number, activeUser.transform.position + Vector3.down, 5F);
+        switch (activeUser.number)
+        {
+            case 0:
+                //音追加
+                AudioManager.instance.PlaySE("SkillAttackSE");
+                var fire = particle.GetComponent<AttackParticle>().Emission(Vector2.zero, activeUser.gameObject, target[0].gameObject);
+                fire.Attack(true);
+                StartCoroutine(TakeDamageToEnemy(1F));
+                break;
+            case 1:
+                //音追加
+                AudioManager.instance.PlaySE("HeelSE");
+                playerGroup.ChangeHpValue(+100F);
+                break;
+            case 2:
+                //音追加
+                AudioManager.instance.PlaySE("AttackBufSE");
+                attackBonus = 2F;
+                break;
+            case 3:
+                //音追加
+                AudioManager.instance.PlaySE("DefBufSE");
+                damageCut = 0.5F;
+                break;
+            default:
+                break;
+        }
+        activeUser.InitGauge(); 
+    }
 
 }

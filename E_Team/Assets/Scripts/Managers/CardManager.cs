@@ -45,8 +45,11 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private int[] usenum;
     private PhotonView view;
 
-    public Vector3 clickposition;
-    public int clickcnt;
+    //山口追加(2018/2/5)
+    public int debugcnt;
+
+    bool OpenOK;
+    bool[] WaitList;
     /// <summary>
     /// 開始時に処理
     /// </summary>
@@ -70,9 +73,10 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         //追加
         NetworkManager.instance.photonview.ObservedComponents.Add(this);
         view = PhotonView.Get(this);
-        clickposition = Vector3.zero;
+        debugcnt = 0;
 
-        clickcnt = 0;
+        WaitList = new bool[] { false, false, false, false };
+        OpenOK = true;
     }
 
     /// <summary>
@@ -84,6 +88,9 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         {
             Debug.Break();
         }
+
+        if (PhotonNetwork.player.ID == 1)
+            view.RPC("AllClientTurnChange", PhotonTargets.AllViaServer);
 
         //追加
         if (useCards == null)
@@ -140,9 +147,9 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         //}
 
         // アクティブユーザーのクリック処理
-        if (Client.click && battle.turnNumber + 1 == PhotonNetwork.player.ID)
+        if (Client.click&& OpenOK && battle.turnNumber + 1 == PhotonNetwork.player.ID)
         {
-            view.RPC("ShareTouchPosition", PhotonTargets.MasterClient, Client.clickPosition);
+            view.RPC("ShareTouchPosition", PhotonTargets.AllViaServer, Client.clickPosition);
         }
 
         // ペア成立の処理
@@ -175,7 +182,9 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             battle.TakeDamageToPlayer();
 
             // ターンの切り替え
-            TurnChange(2.5F);
+            //TurnChange(2.5F);
+            view.RPC("ShareWait",PhotonTargets.MasterClient, PhotonNetwork.player.ID);
+
         }
 
         // 全消しの検知
@@ -188,8 +197,12 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         if (!turnFinish && remainingCards <= 0)
         {
             RemakeCards();
-            TurnChange(2F);
+            //TurnChange(2F);
+            view.RPC("ShareWait", PhotonTargets.MasterClient, PhotonNetwork.player.ID);
+
         }
+
+
     }
 
     /// <summary>
@@ -306,16 +319,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         completeNum = 0;
     }
 
-    /// <summary>
-    /// ターン切り替え
-    /// </summary>
-    void TurnChange(float waitTime = 1F) {
-        StartCoroutine(battle.TurnChange(waitTime));
-        foreach (var effect in attackParticles)
-        {
-            effect.Attack(true);
-        }
-    }
+
 
     /// <summary>
     /// ペアのパーティクル設定
@@ -347,29 +351,29 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         {
             //データの送信
             stream.SendNext(usenum);
-            stream.SendNext(clickposition);
-            foreach (var card in useCards)
-            {
-                card.OnClick(clickposition);//マスタークライアント
-            }
+            stream.SendNext(WaitList);
         }
         else
         {
             usenum = (int[])stream.ReceiveNext();
-            clickposition = (Vector3)stream.ReceiveNext();
-
-
-            if (useCards == null)
-                return;
-            clickcnt++;//クライアントだと二重に呼ばれる（らしい）
-            foreach (var card in useCards)
-            {
-               card.OnClick(clickposition);//クライアント
-            }
-            
+            WaitList = (bool[])stream.ReceiveNext();
         }
     }
 
+
+    ///// <summary>
+    ///// タッチ座標をマスタークライアントに送信します(山口追加)
+    ///// </summary>
+    ///// <param name="_touchposition"></param>
+    //[PunRPC]
+    //void ShareTouchPosition(Vector3 _position)
+    //{
+    //    if (clickposition == _position)
+    //        return;
+    //    clickcnt++;
+
+    //    clickposition = _position;
+    //}
 
     /// <summary>
     /// タッチ座標をマスタークライアントに送信します(山口追加)
@@ -378,11 +382,48 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     [PunRPC]
     void ShareTouchPosition(Vector3 _position)
     {
-        if (clickposition == _position)
-            return;
-        clickcnt++;
+        debugcnt++;
+        foreach (var card in useCards)
+        {
+            card.OnClick(_position);//クライアント
+        }
+    }
 
-        clickposition = _position;
+    [PunRPC]
+    void AllClientTurnChange()
+    {
+        for (var i=0;i< PhotonNetwork.playerList.Length;i++)
+        {
+            if (WaitList[i] == false)
+                return;
+        }
+
+        //TurnChange(2.5F);
+        view.RPC("TurnChange", PhotonTargets.AllViaServer, 2.5F);
+
+        for (var i = 0; i < PhotonNetwork.playerList.Length; i++)
+        {
+            WaitList[i] = false;
+        }
+    }
+
+    [PunRPC]
+    void ShareWait(int _id)
+    {
+        WaitList[_id - 1] = true;
+    }
+
+    [PunRPC]
+    /// <summary>
+    /// ターン切り替え
+    /// </summary>
+    void TurnChange(float waitTime = 1F)
+    {
+        StartCoroutine(battle.TurnChange(waitTime));
+        foreach (var effect in attackParticles)
+        {
+            effect.Attack(true);
+        }
     }
 
 }

@@ -78,9 +78,15 @@ public class Player : MonoBehaviour {
         if (rect.Contains(position) && skillGauge >= 1F)
         {
             // 値を初期化
-            skillTmp = 0F;
+            InitGauge();
             return true;
         }
         return false;
+    }
+
+    public void InitGauge()
+    {
+        // 値を初期化
+        skillTmp = 0F;
     }
 }

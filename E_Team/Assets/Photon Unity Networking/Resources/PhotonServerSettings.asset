@@ -57,4 +57,8 @@ MonoBehaviour:
   - Execute
   - changeclientnum
   - ShareTouchPosition
+  - UseSkill
+  - AllClientTurnChange
+  - ShareWait
+  - TurnChange
   DisableAutoOpenWizard: 1
