@@ -45,6 +45,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private int[] usenum;
     private PhotonView view;
 
+    public Vector3 clickposition;
+    public int clickcnt;
     /// <summary>
     /// 開始時に処理
     /// </summary>
@@ -68,6 +70,9 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         //追加
         NetworkManager.instance.photonview.ObservedComponents.Add(this);
         view = PhotonView.Get(this);
+        clickposition = Vector3.zero;
+
+        clickcnt = 0;
     }
 
     /// <summary>
@@ -125,20 +130,20 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         }
 
         // [Debug]シングルプレイテスト用
-        if (Input.GetMouseButtonDown(0) && !cardMask.gameObject.activeSelf)
-        {
-            foreach (var card in useCards)
-            {
-                if (card.gameObject.activeSelf)
-                    card.OnClick(Input.mousePosition);
-            }
-        }
+        //if (Input.GetMouseButtonDown(0) && !cardMask.gameObject.activeSelf)
+        //{
+        //    foreach (var card in useCards)
+        //    {
+        //        if (card.gameObject.activeSelf)
+        //            card.OnClick(Input.mousePosition);
+        //    }
+        //}
 
         // アクティブユーザーのクリック処理
-        //if (Client.click && battle.turnNumber + 1 == PhotonNetwork.player.ID)
-        //{
-        //    view.RPC("ShareOpenCard", PhotonTargets.All, Client.clickPosition);
-        //}
+        if (Client.click && battle.turnNumber + 1 == PhotonNetwork.player.ID)
+        {
+            view.RPC("ShareTouchPosition", PhotonTargets.MasterClient, Client.clickPosition);
+        }
 
         // ペア成立の処理
         if (turnFinish || pairCard.Count >= remainingCards)
@@ -342,24 +347,42 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         {
             //データの送信
             stream.SendNext(usenum);
+            stream.SendNext(clickposition);
+            foreach (var card in useCards)
+            {
+                card.OnClick(clickposition);//マスタークライアント
+            }
         }
         else
         {
             usenum = (int[])stream.ReceiveNext();
+            clickposition = (Vector3)stream.ReceiveNext();
+
+
+            if (useCards == null)
+                return;
+            clickcnt++;//クライアントだと二重に呼ばれる（らしい）
+            foreach (var card in useCards)
+            {
+               card.OnClick(clickposition);//クライアント
+            }
+            
         }
     }
 
+
     /// <summary>
-    /// カードを開く処理をクライアント全員に実行させます(山口追加)
+    /// タッチ座標をマスタークライアントに送信します(山口追加)
     /// </summary>
     /// <param name="_touchposition"></param>
     [PunRPC]
-    void ShareOpenCard(Vector3 _touchposition)
+    void ShareTouchPosition(Vector3 _position)
     {
-        foreach (var card in useCards)
-        {
-            card.OnClick(Client.clickPosition);
-        }
+        if (clickposition == _position)
+            return;
+        clickcnt++;
+
+        clickposition = _position;
     }
 
 }

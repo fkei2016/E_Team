@@ -9,7 +9,6 @@ public class SwitchActivate : MonoBehaviour {
 
     int keepNumber = 0;
 
-
     public void Execution() {
         //押されたら音を鳴らす
         AudioManager.instance.PlaySE("DecisionSE");

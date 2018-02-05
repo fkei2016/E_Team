@@ -56,4 +56,5 @@ MonoBehaviour:
   - ShareOpenCard
   - Execute
   - changeclientnum
+  - ShareTouchPosition
   DisableAutoOpenWizard: 1

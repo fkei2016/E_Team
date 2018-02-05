@@ -10,7 +10,6 @@ public class TouchParticle : MonoBehaviour {
 
     private ParticleSystem m_ClickParticleSystem;
 
-    PhotonHashTable table;//ハッシュテーブル
     private PhotonView view;
 
     /// <summary>
@@ -24,9 +23,7 @@ public class TouchParticle : MonoBehaviour {
         m_ClickParticleSystem = particle.GetComponent<ParticleSystem>();
         m_ClickParticleSystem.Stop();
 
-        // 座標用のハッシュテーブルを作成
-        table = new PhotonHashTable();
-        view = GetComponent<PhotonView>();
+        NetworkManager.instance.photonview.ObservedComponents.Add(this);
     }
 
     /// <summary>
@@ -50,38 +47,32 @@ public class TouchParticle : MonoBehaviour {
     /// ワールド座標に対する深度
     /// </param>
     public void Emission(Vector3 touchPosition, float depth = 0F) {
-        // タッチされたスクリーン座標からワールド座標へ変換
-        var position = Camera.main.ScreenToWorldPoint(touchPosition + Vector3.forward * 20F);
+      
+        // クライアントのみ座標を変更する
+        m_ClickParticleSystem.transform.position = Camera.main.ScreenToWorldPoint(touchPosition + Vector3.forward * 20F);
 
-        if (NetworkManager.instance)
+    }
+
+    /// <summary>
+    /// turnNumberをクライアント全員に共有します(山口追加)
+    /// </summary>
+    /// <param name="stream"></param>
+    /// <param name="info"></param>
+    void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.isWriting)
         {
-            // テーブル内の座標を書き直す
-            table.Remove("position");
-            table.Add("position", position);
-
-            //PhotonViewを通して全プレイヤーにPlayTouchEventを実行させる
-            view.RPC("PlayTouchEvent", PhotonTargets.AllViaServer, table);//変数同期の時はHashTableを追加してください
+            //データの送信
+            stream.SendNext(m_ClickParticleSystem.transform.position);
         }
         else
         {
-            // クライアントのみ座標を変更する
-            m_ClickParticleSystem.transform.position = position;
+            m_ClickParticleSystem.transform.position = (Vector3)stream.ReceiveNext();
+            // パーティクルの再生
+            m_ClickParticleSystem.Play();
         }
 
-        // パーティクルの再生
-        m_ClickParticleSystem.Play();
-    }
 
-    
-   
-    [PunRPC]
-    private void PlayTouchEvent(PhotonHashTable _table) {
-        object value = null;
-        //HashTableに追加された変数を同期します
-        if (_table.TryGetValue("position", out value))
-        {
-            m_ClickParticleSystem.transform.position = (Vector3)value;
-        }
     }
 
 }

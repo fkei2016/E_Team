@@ -26,6 +26,8 @@ public class NetworkManager : SingletonMonoBehaviour<NetworkManager> {
         photonview = GetComponent<PhotonView>();
 
         DontDestroyOnLoad(this.gameObject);
+        PhotonNetwork.sendRate = 60;
+
     }
 
     void OnJoinedLobby()
@@ -43,6 +45,7 @@ public class NetworkManager : SingletonMonoBehaviour<NetworkManager> {
         {
             PhotonNetwork.playerName = "Player" + player.Length;
         }
+
     }
 
     void OnPhotonRandomJoinFailed()
