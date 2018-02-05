@@ -36,7 +36,7 @@ public class SingletonMonoBehaviour<Type> :MonoBehaviour where Type : MonoBehavi
         // シーンを跨いで破棄されないオブジェクト
         if (dontDestory)
         {
-            DontDestroyOnLoad(this.gameObject);
+            DontDestroyOnLoad(this);
         }
     }
 }

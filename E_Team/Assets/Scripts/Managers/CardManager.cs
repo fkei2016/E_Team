@@ -65,11 +65,17 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // バトルの管理者と連携
         battle = BattleManager.instance;
 
+        // 攻撃エフェクト用の配列を生成
         attackParticles = new List<AttackParticle>();
 
-        //追加
-        NetworkManager.instance.photonview.ObservedComponents.Add(this);
-        view = PhotonView.Get(this);
+        // ネットワークマネージャの取得
+        var nMrg = NetworkManager.instance;
+        if (nMrg)
+        {
+            // 通知者に自信を追加
+            nMrg.photonview.ObservedComponents.Add(this);
+            view = PhotonView.Get(this);
+        }
         clickposition = Vector3.zero;
 
         clickcnt = 0;
@@ -142,7 +148,17 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // アクティブユーザーのクリック処理
         if (Client.click && battle.turnNumber + 1 == PhotonNetwork.player.ID)
         {
-            view.RPC("ShareTouchPosition", PhotonTargets.MasterClient, Client.clickPosition);
+            if (PhotonNetwork.connecting)
+            {
+                view.RPC("ShareTouchPosition", PhotonTargets.MasterClient, Client.clickPosition);
+            }
+            else
+            {
+                foreach (var card in useCards)
+                {
+                    card.OnClick(Client.clickPosition);
+                }
+            }
         }
 
         // ペア成立の処理
@@ -221,8 +237,6 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 var missFX = GetComponent<MissEffect>();
                 StartCoroutine(missFX.Emission(card1.transform));
                 StartCoroutine(missFX.Emission(card2.transform));
-                //音追加
-                AudioManager.instance.PlaySE("MissSE");
                 // カードを閉じる
                 StartCoroutine(card1.Close(1.5F));
                 StartCoroutine(card2.Close(1.5F));
@@ -234,8 +248,6 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 // ペアパーティクルの発生
                 PairParticle(card1, GetComponent<TouchCombo>());
                 PairParticle(card2, GetComponent<TouchCombo>());
-                //音追加
-                AudioManager.instance.PlaySE("PearSE");
                 // ペアカードを積む
                 pairCard.Push(card1);
                 pairCard.Push(card2);
@@ -289,9 +301,15 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         }
 
         //追加
-        if (PhotonNetwork.isMasterClient)
+        if(PhotonNetwork.connecting)
+        {
+            if (PhotonNetwork.isMasterClient)
+                usenum = array.ToArray();
+        }
+        else
+        {
             usenum = array.ToArray();
-
+        }
 
         // カードに番号を割り振る
         generator.AppendPairList(useCards, usenum);
@@ -343,6 +361,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     /// <param name="info"></param>
     void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
+        if (!PhotonNetwork.connecting) return;
+
         if (stream.isWriting)
         {
             //データの送信
