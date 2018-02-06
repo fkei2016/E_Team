@@ -160,7 +160,7 @@ MonoBehaviour:
   skill: {fileID: 2018643554}
   gameover: {fileID: 172775783}
   gameclear: {fileID: 1354215423}
-  turnNumber: 0
+  mask: {fileID: 1593254655}
 --- !u!114 &37863507
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3276,7 +3276,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49ee27f60cdf3854381736cc84b4f1ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dontDestory: 1
 --- !u!4 &2016743632
 Transform:
   m_ObjectHideFlags: 0

@@ -16,11 +16,14 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     [SerializeField]
     private GameObject gameclear;
 
+    [SerializeField]
+    private GameObject mask;
+
+    public int turnNumber { get; private set; }
 
     private float damageCut = 1F;
     private float attackBonus = 1F;
 
-    public int turnNumber;//publibに変更しました（山口追加）
     private Enemy[] target;
     private Player[] users;
 
@@ -62,6 +65,9 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
             user.active = true;
         }
         users[turnNumber].active = false;
+
+        //マスクのアクティブ状態を変更する
+        mask.active = (turnNumber + 1 != PhotonNetwork.player.ID);
 
         //山口追加
         view = PhotonView.Get(this);
@@ -123,6 +129,11 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
             user.active = true;
         }
         users[turnNumber].active = false;
+
+
+        //マスクのアクティブ状態を変更する
+        mask.active = (turnNumber + 1 != PhotonNetwork.player.ID);
+
     }
 
     /// <summary>

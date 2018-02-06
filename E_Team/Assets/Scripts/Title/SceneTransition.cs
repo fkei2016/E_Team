@@ -17,9 +17,10 @@ public class SceneTransition : MonoBehaviour {
     }
 
     private void Update() {
-        if (!PhotonNetwork.isMasterClient)
-            return;
+        // マスター以外のIDは早期終了
+        if (PhotonNetwork.player.ID != 1) return;
 
+        // トリガーのオブジェクトがアクティブだと遷移
         if (trigger.activeSelf)
         {
             view.RPC("Execute", PhotonTargets.All);

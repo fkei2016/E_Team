@@ -4,7 +4,9 @@ using UnityEngine;
 
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class NetworkManager : SingletonMonoBehaviour<NetworkManager> {
+public class NetworkManager : MonoBehaviour {
+
+    public static NetworkManager instance;
 
     public RoomOptions roomOptions
     {
@@ -18,16 +20,20 @@ public class NetworkManager : SingletonMonoBehaviour<NetworkManager> {
 
     private Orderbace networkorder;
 
-    protected override void Awake()
+    private void Awake()
     {
-        base.Awake();
+        instance = this;
+        DontDestroyOnLoad(this);
+
 
         PhotonNetwork.ConnectUsingSettings("ver2.1");
         photonview = GetComponent<PhotonView>();
 
         DontDestroyOnLoad(this.gameObject);
+
         PhotonNetwork.sendRate = 60;
 
+        photonview = GetComponent<PhotonView>();
     }
 
     void OnJoinedLobby()
