@@ -40,6 +40,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     [SerializeField]
     private GameObject effectPearent;
     private List<AttackParticle> attackParticles;
+    private int openCardCount = 0; //カードをオープンした時のやつ
 
     //山口追加
     private int[] usenum;
@@ -92,6 +93,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     /// 更新時に処理
     /// </summary>
     private void Update() {
+
+        print(openCardCount);
         // [Debug]ブレイクポイント
         if(Input.GetKeyDown(KeyCode.Space))
         {
@@ -155,12 +158,17 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         //    }
         //}
 
-        // アクティブユーザーのクリック処理
-        if (Client.click&& OpenOK && battle.turnNumber + 1 == PhotonNetwork.player.ID)
+
+        //３枚目を開かないための処理
+        if (openCardCount < 2)
         {
+            // アクティブユーザーのクリック処理
+            if (Client.click && OpenOK && battle.turnNumber + 1 == PhotonNetwork.player.ID)
+            {
 
-            view.RPC("ShareTouchPosition", PhotonTargets.AllViaServer, Client.clickPosition);
+                view.RPC("ShareTouchPosition", PhotonTargets.AllViaServer, Client.clickPosition);
 
+            }
         }
 
         // ペア成立の処理
@@ -177,6 +185,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 {
                     var waitTime = (completeNum < useCards.Length) ? 1F : 4F;
                     StartCoroutine(battle.TakeDamageToEnemy(waitTime));
+                    StartCoroutine(OpenCardCountInit(waitTime));
                 }
 
                 // スキル上昇
@@ -248,6 +257,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 // カードを閉じる
                 StartCoroutine(card1.Close(1.5F));
                 StartCoroutine(card2.Close(1.5F));
+                StartCoroutine(OpenCardCountInit(1.5F));
                 completeNum--;
                 completeNum--;
             }
@@ -259,6 +269,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 // ペアカードを積む
                 pairCard.Push(card1);
                 pairCard.Push(card2);
+                StartCoroutine(OpenCardCountInit(1.5F));
             }
         }
     }
@@ -392,7 +403,9 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         debugcnt++;
         foreach (var card in useCards)
         {
-            card.OnClick(_position);//クライアント
+            //クライアント
+            if (card.OnClick(_position))
+                openCardCount++;
         }
     }
 
@@ -406,8 +419,11 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         }
 
         //TurnChange(2.5F);
-        view.RPC("TurnChange", PhotonTargets.AllViaServer, 2.5F);
 
+        //ターン切り替え時カウントを初期化
+
+        view.RPC("TurnChange", PhotonTargets.AllViaServer, 2.5F);
+       
         for (var i = 0; i < PhotonNetwork.playerList.Length; i++)
         {
             WaitList[i] = false;
@@ -431,6 +447,15 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         {
             effect.Attack(true);
         }
+    }
+
+
+
+    public IEnumerator OpenCardCountInit(float waitTime = 0F)
+    {
+        yield return new WaitForSeconds(waitTime);
+
+        openCardCount = 0;
     }
 
 }

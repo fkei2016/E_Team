@@ -157,6 +157,10 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
 
         // 攻撃力向上の解除
         if (attackBonus >= 1F) attackBonus = 1F;
+
+        //カードマネージャーのカードカウントを初期化
+        CardManager.instance.OpenCardCountInit();
+
     }
 
     /// <summary>
