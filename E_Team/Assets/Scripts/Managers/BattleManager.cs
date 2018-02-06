@@ -147,7 +147,8 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         yield return new WaitForSeconds(waitTime);
 
         //音追加
-        AudioManager.instance.PlaySE("PlayerAttackSE");
+        var audio = AudioManager.instance;
+        if (audio) audio.PlaySE("PlayerAttackSE");
 
         // ダメージ計算とアニメーション
         target[0].TakeDamage(playerGroup.atkPower * attackBonus);
@@ -169,7 +170,8 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         {
 
             //音追加
-            AudioManager.instance.PlaySE("EnemyAttackSE");
+            var audio = AudioManager.instance;
+            if(audio) audio.PlaySE("EnemyAttackSE");
 
             target[0].PlayAttackAnimation();
             playerGroup.ChangeHpValue(-target[0].atkPower * damageCut);
@@ -200,29 +202,30 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     [PunRPC]
     void UseSkill()
     {
+        var audio = AudioManager.instance;
         var particle = skill.Emission(activeUser.number, activeUser.transform.position + Vector3.down, 5F);
         switch (activeUser.number)
         {
             case 0:
                 //音追加
-                AudioManager.instance.PlaySE("SkillAttackSE");
+                if(audio) audio.PlaySE("SkillAttackSE");
                 var fire = particle.GetComponent<AttackParticle>().Emission(Vector2.zero, activeUser.gameObject, target[0].gameObject);
                 fire.Attack(true);
                 StartCoroutine(TakeDamageToEnemy(1F));
                 break;
             case 1:
                 //音追加
-                AudioManager.instance.PlaySE("HeelSE");
+                if (audio) audio.PlaySE("HeelSE");
                 playerGroup.ChangeHpValue(+100F);
                 break;
             case 2:
                 //音追加
-                AudioManager.instance.PlaySE("AttackBufSE");
+                if (audio) audio.PlaySE("AttackBufSE");
                 attackBonus = 2F;
                 break;
             case 3:
                 //音追加
-                AudioManager.instance.PlaySE("DefBufSE");
+                if (audio) audio.PlaySE("DefBufSE");
                 damageCut = 0.5F;
                 break;
             default:
