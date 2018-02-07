@@ -29,6 +29,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private CardSpacement spacement;
     private Vector3[] cardPositions;
     private BattleManager battle;
+    private int openCardCount = 0;
 
     [Header("AttakParticle")]
 
@@ -160,7 +161,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         //}
 
         // アクティブユーザーのクリック処理
-        if (Client.click&& OpenOK && battle.turnNumber + 1 == PhotonNetwork.player.ID)
+        if (Client.click && openCardCount < 2 && battle.turnNumber + 1 == PhotonNetwork.player.ID)
         {
             view.RPC("ShareTouchPosition", PhotonTargets.AllViaServer, Client.clickPosition);
         }
@@ -179,6 +180,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 {
                     var waitTime = (completeNum < useCards.Length) ? 1F : 4F;
                     StartCoroutine(battle.TakeDamageToEnemy(waitTime));
+                    StartCoroutine(OpenCardCountInit(waitTime));
                 }
 
                 // スキル上昇
@@ -253,6 +255,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 // カードを閉じる
                 StartCoroutine(card1.Close(1.5F));
                 StartCoroutine(card2.Close(1.5F));
+                StartCoroutine(OpenCardCountInit(1.5F));
                 completeNum--;
                 completeNum--;
             }
@@ -264,6 +267,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
                 // ペアカードを積む
                 pairCard.Push(card1);
                 pairCard.Push(card2);
+                StartCoroutine(OpenCardCountInit(1.5F));
             }
         }
     }
@@ -415,7 +419,10 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     {
         foreach (var card in useCards)
         {
-            card.OnClick(_position);//クライアント
+            if (card.OnClick(_position)) ;//クライアント
+            {
+                openCardCount++;
+            }
         }
     }
 
@@ -463,4 +470,8 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         }
     }
 
+    public IEnumerator OpenCardCountInit(float waitTime = 1F) {
+        yield return new WaitForSeconds(waitTime);
+        openCardCount = 0;
+    }
 }

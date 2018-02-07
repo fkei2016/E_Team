@@ -21,6 +21,7 @@ public class Card : MonoBehaviour {
     private bool isPlayFade;
 
     private Animation anim;
+    private CardManager cMng;
 
     public bool active
     {
@@ -44,6 +45,8 @@ public class Card : MonoBehaviour {
 
         // フェードアウトのアニメーションを追加
         anim = gameObject.AddAnimationClip(new string[] { "FadeOut" });
+
+        cMng = CardManager.instance;
     }
 
     /// <summary>
@@ -77,7 +80,7 @@ public class Card : MonoBehaviour {
     /// カードを開く
     /// </summary>
     public void Open() {
-        CardManager.instance.SendCard(this);
+        cMng.SendCard(this);
         rotateFlag = true;
         toRotation = 180F;
     }

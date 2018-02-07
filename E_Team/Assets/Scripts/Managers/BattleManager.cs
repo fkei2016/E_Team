@@ -24,6 +24,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     [SerializeField]
     private GameObject mask;
 
+
     public int turnNumber { get; private set; }
 
     private int damageCutCnt = 0;
@@ -33,6 +34,8 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     private Player[] users;
 
     private PhotonView view;
+    private AudioManager aMng;
+    private CardManager cMng;
 
     public Player activeUser
     {
@@ -78,6 +81,8 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
 
         //マスクのアクティブ状態を変更する
         mask.active = (turnNumber + 1 != PhotonNetwork.player.ID);
+        aMng = AudioManager.instance;
+        cMng = CardManager.instance;
 
         //山口追加
         view = PhotonView.Get(this);
@@ -160,8 +165,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         yield return new WaitForSeconds(waitTime);
 
         //音追加
-        var audio = AudioManager.instance;
-        if (audio) audio.PlaySE("PlayerAttackSE");
+        if (aMng) aMng.PlaySE("PlayerAttackSE");
 
         // ダメージ計算とアニメーション
         target[0].TakeDamage(playerGroup.atkPower * attackBonus);
@@ -171,8 +175,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         if (attackBonus > 1F) attackBonus = 1F;
 
         //カードマネージャーのカードカウントを初期化
-        CardManager.instance.OpenCardCountInit();
-
+        cMng.OpenCardCountInit();
     }
 
     /// <summary>
@@ -184,10 +187,8 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     public void TakeDamageToPlayer() {
         if (target[0].AtkCountDown())
         {
-
             //音追加
-            var audio = AudioManager.instance;
-            if(audio) audio.PlaySE("EnemyAttackSE");
+            if(aMng) aMng.PlaySE("EnemyAttackSE");
 
             target[0].PlayAttackAnimation();
             
@@ -218,30 +219,29 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     [PunRPC]
     void UseSkill()
     {
-        var audio = AudioManager.instance;
         var particle = skill.Emission(activeUser.number, activeUser.transform.position + Vector3.down, 5F);
         switch (activeUser.number)
         {
             case 0:
                 //音追加
-                if(audio) audio.PlaySE("SkillAttackSE");
+                if(aMng) aMng.PlaySE("SkillAttackSE");
                 var fire = particle.GetComponent<AttackParticle>().Emission(Vector2.zero, activeUser.gameObject, target[0].gameObject);
                 fire.Attack(true);
                 StartCoroutine(TakeDamageToEnemy(1F));
                 break;
             case 1:
                 //音追加
-                if (audio) audio.PlaySE("HeelSE");
+                if (aMng) aMng.PlaySE("HeelSE");
                 playerGroup.ChangeHpValue(+100F);
                 break;
             case 2:
                 //音追加
-                if (audio) audio.PlaySE("AttackBufSE");
+                if (aMng) aMng.PlaySE("AttackBufSE");
                 attackBonus = 2F;
                 break;
             case 3:
                 //音追加
-                if (audio) audio.PlaySE("DefBufSE");
+                if (aMng) aMng.PlaySE("DefBufSE");
                 damageCutCnt = 3;
                 break;
             default:
