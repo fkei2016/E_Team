@@ -17,11 +17,16 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     private GameObject gameclear;
 
     [SerializeField]
+    private GameObject atkIcon;
+    [SerializeField]
+    private GameObject defIcon;
+
+    [SerializeField]
     private GameObject mask;
 
     public int turnNumber { get; private set; }
 
-    private float damageCut = 1F;
+    private int damageCutCnt = 0;
     private float attackBonus = 1F;
 
     private Enemy[] target;
@@ -66,6 +71,11 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         }
         users[turnNumber].active = false;
 
+        atkIcon.SetActive(false);
+        defIcon.SetActive(false);
+        gameover.SetActive(false);
+        gameclear.SetActive(false);
+
         //マスクのアクティブ状態を変更する
         mask.active = (turnNumber + 1 != PhotonNetwork.player.ID);
 
@@ -85,6 +95,9 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
                 view.RPC("UseSkill", PhotonTargets.AllViaServer);
             }
         }
+
+        atkIcon.SetActive(attackBonus > 1F);
+        defIcon.SetActive(damageCutCnt > 0);
 
         // ゲームオーバー
         gameover.SetActive(playerGroup.TakeDown());
@@ -152,11 +165,10 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
 
         // ダメージ計算とアニメーション
         target[0].TakeDamage(playerGroup.atkPower * attackBonus);
-        //target.gameObject.SetActive(takeDown);
         target[0].PlayDamageAnimation();
 
         // 攻撃力向上の解除
-        if (attackBonus >= 1F) attackBonus = 1F;
+        if (attackBonus > 1F) attackBonus = 1F;
 
         //カードマネージャーのカードカウントを初期化
         CardManager.instance.OpenCardCountInit();
@@ -178,9 +190,9 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
             if(audio) audio.PlaySE("EnemyAttackSE");
 
             target[0].PlayAttackAnimation();
+            
+            var damageCut = (damageCutCnt-- > 0) ? 0.5F : 1F;
             playerGroup.ChangeHpValue(-target[0].atkPower * damageCut);
-
-            if (damageCut <= 1F) damageCut = 1F;
         }
     }
 
@@ -230,7 +242,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
             case 3:
                 //音追加
                 if (audio) audio.PlaySE("DefBufSE");
-                damageCut = 0.5F;
+                damageCutCnt = 3;
                 break;
             default:
                 break;
