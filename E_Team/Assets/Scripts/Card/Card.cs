@@ -100,13 +100,13 @@ public class Card : MonoBehaviour {
         isPlayFade = true;
     }
 
+  
     /// <summary>
-    /// クリック処理
+    /// クリック時の処理
     /// </summary>
-    /// <param name="position">
-    /// クリック座標
-    /// </param>
-    public void OnClick(Vector3 position) {
+    /// <param name="position">タッチ座標</param>
+    /// <returns>交点</returns>
+    public bool OnClick(Vector3 position) {
         var worldPosition = Camera.main.WorldToScreenPoint(transform.position);
 
         // カードの矩形とクリック座標の交点で判定
@@ -114,9 +114,13 @@ public class Card : MonoBehaviour {
         if (rect.Contains(position))
         {
             if (back.activeSelf && !rotateFlag)
+            {
                 Open();
+                return true;
+            }
         }
 
+        return false;
     }
 
 }
