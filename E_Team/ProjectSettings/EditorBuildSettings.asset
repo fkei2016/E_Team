@@ -6,10 +6,10 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/Scenes/Y_Network.unity
+    path: 
     guid: b889aebe3c59e4d4ab840d7d2017b84c
   - enabled: 0
-    path: Assets/Scenes/O_Test.unity
+    path: 
     guid: 427a10277e6385d4c92f649ae2f2e8fa
   - enabled: 1
     path: Assets/Scenes/Title.unity
@@ -18,5 +18,5 @@ EditorBuildSettings:
     path: Assets/Scenes/Play.unity
     guid: 3e3d82d418eefe64480713e7b2b47219
   - enabled: 0
-    path: Assets/Scenes/F_Play.unity
+    path: 
     guid: 2379ba40064736049a10b476c584abe7

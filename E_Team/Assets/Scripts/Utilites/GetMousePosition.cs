@@ -15,7 +15,7 @@ public class GetMousePosition : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        var text = new Vector3(Client.clickPosition.x, Client.clickPosition.y, CardManager.instance.debugcnt).ToString();
+        var text = new Vector3(Client.clickPosition.x, Client.clickPosition.y, 0).ToString();
         mousePositionText.text = text;
 	}
 }

@@ -46,10 +46,12 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private PhotonView view;
 
     //山口追加(2018/2/5)
-    public int debugcnt;
-
     bool OpenOK;
     bool[] WaitList;
+    private int[] prevusenum;
+
+    int Opencnt;
+
     /// <summary>
     /// 開始時に処理
     /// </summary>
@@ -72,9 +74,9 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         attackParticles = new List<AttackParticle>();
 
         //追加
-        NetworkManager.instance.photonview.ObservedComponents.Add(this);
-        view = PhotonView.Get(this);
-        debugcnt = 0;
+        //NetworkManager.instance.photonview.ObservedComponents.Add(this);
+        //view = PhotonView.Get(this);
+        //debugcnt = 0;
         // ネットワークマネージャの取得
         var nMrg = NetworkManager.instance;
         if (nMrg)
@@ -98,13 +100,15 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
             Debug.Break();
         }
 
-        if (PhotonNetwork.player.ID == 1)
-            view.RPC("AllClientTurnChange", PhotonTargets.AllViaServer);
-
-        //追加
         if (useCards == null)
         {
-            RemakeCards(false);
+            RemakeCards();
+            return;
+        }
+
+        if (PhotonNetwork.player.ID == 1)
+        {
+            view.RPC("AllClientTurnChange", PhotonTargets.MasterClient);
         }
 
         // ペア数が変わったときに生成
@@ -158,9 +162,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // アクティブユーザーのクリック処理
         if (Client.click&& OpenOK && battle.turnNumber + 1 == PhotonNetwork.player.ID)
         {
-
             view.RPC("ShareTouchPosition", PhotonTargets.AllViaServer, Client.clickPosition);
-
         }
 
         // ペア成立の処理
@@ -207,12 +209,15 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // 再配布とターン切り替え
         if (!turnFinish && remainingCards <= 0)
         {
-            RemakeCards();
-            //TurnChange(2F);
+
             view.RPC("ShareWait", PhotonTargets.MasterClient, PhotonNetwork.player.ID);
 
+            if (PhotonNetwork.isMasterClient)
+            {
+                RemakeCards();
+            }
+            //TurnChange(2F);
         }
-
 
     }
 
@@ -288,14 +293,25 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     /// 子要素の破棄
     /// </param>
     private void RemakeCards(bool reset = true) {
-        if (reset)
+
+
+        //追加
+        if (PhotonNetwork.player.ID != 1&& prevusenum != null)
+        {
+            if (usenum == prevusenum)
+                return;
+        }
+
+        if (reset && useCards != null)
         {
             // 既存のカードを破棄
             foreach (var card in useCards)
             {
                 Destroy(card.gameObject);
             }
+
             usenum.Initialize();//追加
+            
         }
 
         // カードの再生成
@@ -312,6 +328,9 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         if (PhotonNetwork.isMasterClient)
             usenum = array.ToArray();
 
+
+        prevusenum = usenum;
+
         // カードに番号を割り振る
         generator.AppendPairList(useCards, usenum);
         remainingCards = useCards.Length;
@@ -323,6 +342,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         // ターンを変更
         turnFinish = false;
         completeNum = 0;
+
     }
 
 
@@ -364,6 +384,10 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         {
             usenum = (int[])stream.ReceiveNext();
             WaitList = (bool[])stream.ReceiveNext();
+
+            if(usenum!=prevusenum&& !PhotonNetwork.isMasterClient && remainingCards <= 0)
+                RemakeCards();
+
         }
     }
 
@@ -389,13 +413,15 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     [PunRPC]
     void ShareTouchPosition(Vector3 _position)
     {
-        debugcnt++;
         foreach (var card in useCards)
         {
             card.OnClick(_position);//クライアント
         }
     }
 
+    /// <summary>
+    /// ターン切り替えを共有
+    /// </summary>
     [PunRPC]
     void AllClientTurnChange()
     {
@@ -414,16 +440,20 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
         }
     }
 
+    /// <summary>
+    /// 待機状態を共有
+    /// </summary>
     [PunRPC]
     void ShareWait(int _id)
     {
         WaitList[_id - 1] = true;
     }
 
-    [PunRPC]
+
     /// <summary>
     /// ターン切り替え
     /// </summary>
+    [PunRPC]
     void TurnChange(float waitTime = 1F)
     {
         StartCoroutine(battle.TurnChange(waitTime));

@@ -78,7 +78,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     /// 更新時に実行
     /// </summary>
     private void Update() {
-        if(Client.click)
+        if(Client.click && turnNumber + 1 == PhotonNetwork.player.ID)
         {
             if (activeUser.OnClick(Client.clickPosition))
             {
@@ -90,6 +90,11 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
         gameover.SetActive(playerGroup.TakeDown());
         // ゲームクリア
         gameclear.SetActive(target[0].TakeDown());
+
+        if (gameclear.active || gameover.active)
+        {
+            mask.active = false;
+        }
 
         // ゲームが終了した後はタイトルへ遷移
         if(gameover.activeSelf || gameclear.activeSelf)
@@ -200,6 +205,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
     [PunRPC]
     void UseSkill()
     {
+
         var particle = skill.Emission(activeUser.number, activeUser.transform.position + Vector3.down, 5F);
         switch (activeUser.number)
         {

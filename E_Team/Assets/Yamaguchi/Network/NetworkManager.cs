@@ -26,7 +26,7 @@ public class NetworkManager : MonoBehaviour {
         DontDestroyOnLoad(this);
 
 
-        PhotonNetwork.ConnectUsingSettings("ver2.1");
+        PhotonNetwork.ConnectUsingSettings("ver2.2");
         photonview = GetComponent<PhotonView>();
 
         DontDestroyOnLoad(this.gameObject);
