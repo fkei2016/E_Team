@@ -29,7 +29,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     private CardSpacement spacement;
     private Vector3[] cardPositions;
     private BattleManager battle;
-    private int openCardCount = 0;
+    public int openCardCount = 0;
 
     [Header("AttakParticle")]
 
@@ -50,8 +50,6 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     bool OpenOK;
     bool[] WaitList;
     private int[] prevusenum;
-
-    int Opencnt;
 
     /// <summary>
     /// 開始時に処理
@@ -109,7 +107,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
 
         if (PhotonNetwork.player.ID == 1)
         {
-            view.RPC("AllClientTurnChange", PhotonTargets.MasterClient);
+            AllClientTurnChange();
         }
 
         // ペア数が変わったときに生成
@@ -419,7 +417,7 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     {
         foreach (var card in useCards)
         {
-            if (card.OnClick(_position)) ;//クライアント
+            if (card.OnClick(_position))//クライアント
             {
                 openCardCount++;
             }
@@ -429,7 +427,6 @@ public class CardManager : SingletonMonoBehaviour<CardManager> {
     /// <summary>
     /// ターン切り替えを共有
     /// </summary>
-    [PunRPC]
     void AllClientTurnChange()
     {
         for (var i=0;i< PhotonNetwork.playerList.Length;i++)

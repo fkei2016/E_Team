@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class JumpToScene : MonoBehaviour {
 
+
     [SerializeField]
     private string sceneName;
 
@@ -15,4 +16,5 @@ public class JumpToScene : MonoBehaviour {
     public void Execute() {
         PhotonNetwork.LoadLevel(sceneName);
     }
+
 }

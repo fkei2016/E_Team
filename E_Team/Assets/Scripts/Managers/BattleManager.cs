@@ -150,7 +150,7 @@ public class BattleManager : SingletonMonoBehaviour<BattleManager> {
 
 
         //マスクのアクティブ状態を変更する
-        mask.active = (turnNumber + 1 != PhotonNetwork.player.ID);
+        mask.SetActive(turnNumber + 1 != PhotonNetwork.player.ID);
 
     }
 

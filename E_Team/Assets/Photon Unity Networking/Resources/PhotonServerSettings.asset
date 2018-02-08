@@ -61,4 +61,5 @@ MonoBehaviour:
   - AllClientTurnChange
   - ShareWait
   - TurnChange
+  - ChangeActivate
   DisableAutoOpenWizard: 1

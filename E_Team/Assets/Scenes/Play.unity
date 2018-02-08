@@ -2297,6 +2297,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c47b40d939ad98e44976c3395e389466, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mousePositionText: {fileID: 0}
 --- !u!114 &1455860893
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3105,7 +3106,6 @@ MonoBehaviour:
     type: 2}
   enemy: {fileID: 1255921962}
   effectPearent: {fileID: 2018643552}
-  debugcnt: 0
 --- !u!114 &1707120615
 MonoBehaviour:
   m_ObjectHideFlags: 0
